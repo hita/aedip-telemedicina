@@ -10,7 +10,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
 
   // Check authentication
-  const { data: user, isLoading: userLoading } = useQuery<{user: {id: number, email: string}}>({
+  const { data: user, isLoading: userLoading } = useQuery<{user: {id: number, email: string, rol: string, nombre: string}}>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
@@ -56,7 +56,9 @@ export default function Dashboard() {
       {/* Header */}
       <div className="bg-medical-blue text-white px-6 py-4">
         <div className="mb-2">
-          <h1 className="text-xl font-semibold">Panel de Casos</h1>
+          <h1 className="text-xl font-semibold">
+            {user?.user?.rol === "experto" ? "Panel de Experto" : "Panel de Casos"}
+          </h1>
         </div>
         {user?.user && <UserBadge user={user.user} />}
       </div>
@@ -64,7 +66,9 @@ export default function Dashboard() {
       {/* Cases List */}
       <div className="px-6 py-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium">Mis Casos</h2>
+          <h2 className="text-lg font-medium">
+            {user?.user?.rol === "experto" ? "Todos los Casos del Sistema" : "Mis Casos"}
+          </h2>
           <span className="text-sm text-secondary">
             {cases.length} casos
           </span>

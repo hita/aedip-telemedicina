@@ -11,6 +11,8 @@ interface UserBadgeProps {
   user: {
     id: number;
     email: string;
+    rol: string;
+    nombre: string;
   };
 }
 
@@ -30,11 +32,7 @@ export function UserBadge({ user }: UserBadgeProps) {
   };
 
   const getUserType = () => {
-    // Based on the hardcoded user email, determine user type
-    if (user.email === "doctor@hospital.com") {
-      return "Médico";
-    }
-    return "Usuario";
+    return user.rol === "experto" ? "Experto" : "Médico";
   };
 
   return (
@@ -44,7 +42,7 @@ export function UserBadge({ user }: UserBadgeProps) {
           <Stethoscope className="w-4 h-4 text-white" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-white">{user.email}</span>
+          <span className="text-sm font-medium text-white">{user.nombre}</span>
           <Badge variant="secondary" className="text-xs w-fit">
             {getUserType()}
           </Badge>
@@ -63,7 +61,8 @@ export function UserBadge({ user }: UserBadgeProps) {
         </PopoverTrigger>
         <PopoverContent className="w-48" align="end">
           <div className="space-y-2">
-            <div className="text-sm font-medium">{user.email}</div>
+            <div className="text-sm font-medium">{user.nombre}</div>
+            <div className="text-xs text-muted-foreground">{user.email}</div>
             <div className="text-xs text-muted-foreground">{getUserType()}</div>
             <hr />
             <Button

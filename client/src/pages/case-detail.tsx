@@ -15,7 +15,7 @@ export default function CaseDetail() {
     enabled: !!id,
   });
 
-  const { data: user } = useQuery<{user: {id: number, email: string}}>({
+  const { data: user } = useQuery<{user: {id: number, email: string, rol: string, nombre: string}}>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });

@@ -29,7 +29,7 @@ export default function NewCase() {
   const { toast } = useToast();
 
   // Check authentication
-  const { data: user } = useQuery<{user: {id: number, email: string}}>({
+  const { data: user } = useQuery<{user: {id: number, email: string, rol: string, nombre: string}}>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
