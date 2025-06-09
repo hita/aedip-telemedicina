@@ -1,11 +1,13 @@
 import { users, cases, messages, type User, type InsertUser, type Case, type InsertCase, type Message, type InsertMessage } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
+import { AuthUtils } from "./auth";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  verifyUserPassword(email: string, password: string): Promise<User | null>;
   getCases(): Promise<Case[]>;
   getCasesByCreator(creatorName: string): Promise<Case[]>;
   getCaseById(id: number): Promise<Case | undefined>;
@@ -33,11 +35,17 @@ export class MemStorage implements IStorage {
     this.currentCaseId = 1;
     this.currentMessageId = 1;
 
-    // Initialize with hardcoded users
+    // Initialize with hardcoded users with hashed passwords
+    this.initializeUsers();
+  }
+
+  private async initializeUsers() {
+    const { medico: medicoPasswordHash, experto: expertoPasswordHash } = await AuthUtils.generateDefaultPasswords();
+    
     const medico: User = {
       id: 1,
       email: "doctor@hospital.com",
-      password: "1234",
+      password: medicoPasswordHash,
       rol: "medico",
       nombre: "Dr. García"
     };
@@ -45,7 +53,7 @@ export class MemStorage implements IStorage {
     const experto: User = {
       id: 2,
       email: "experto@hospital.com",
-      password: "1234",
+      password: expertoPasswordHash,
       rol: "experto",
       nombre: "Dr. María Rodríguez"
     };
@@ -150,11 +158,24 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async verifyUserPassword(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+    
+    const isValid = await AuthUtils.verifyPassword(password, user.password);
+    return isValid ? user : null;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
+    // Hash the password before storing
+    const hashedPassword = await AuthUtils.hashPassword(insertUser.password);
     const user: User = { 
       ...insertUser, 
       id,
+      password: hashedPassword,
       rol: insertUser.rol || "medico"
     };
     this.users.set(id, user);
@@ -359,10 +380,25 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async verifyUserPassword(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+    
+    const isValid = await AuthUtils.verifyPassword(password, user.password);
+    return isValid ? user : null;
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Hash the password before storing
+    const hashedPassword = await AuthUtils.hashPassword(insertUser.password);
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values({
+        ...insertUser,
+        password: hashedPassword
+      })
       .returning();
     return user;
   }
