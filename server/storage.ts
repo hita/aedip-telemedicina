@@ -11,6 +11,7 @@ export interface IStorage {
   getCaseById(id: number): Promise<Case | undefined>;
   createCase(case_: InsertCase, creadoPor: string): Promise<Case>;
   assignExpertToCase(caseId: number, expertName: string | null): Promise<Case | undefined>;
+  updateCaseStatus(caseId: number, newStatus: string, razon?: string): Promise<Case | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -180,16 +181,48 @@ export class MemStorage implements IStorage {
       status: "Nuevo",
       expertoAsignado: null,
       creadoPor,
+      razonCambio: null,
+      reabierto: false,
+      historialEstados: [],
       createdAt: new Date()
     };
     this.cases.set(id, case_);
     return case_;
   }
+
+  async updateCaseStatus(caseId: number, newStatus: string, razon?: string): Promise<Case | undefined> {
+    const case_ = this.cases.get(caseId);
+    if (case_) {
+      const oldStatus = case_.status;
+      case_.status = newStatus;
+      case_.razonCambio = razon || null;
+      
+      // Add to history
+      const historyEntry = {
+        estadoAnterior: oldStatus,
+        estadoNuevo: newStatus,
+        razon: razon || null,
+        fecha: new Date().toISOString()
+      };
+      case_.historialEstados = Array.isArray(case_.historialEstados) 
+        ? [...case_.historialEstados, historyEntry]
+        : [historyEntry];
+      
+      // Set reabierto flag if reopening a closed case
+      if ((oldStatus === "Resuelto" || oldStatus === "Cancelado") && newStatus === "En revisión") {
+        case_.reabierto = true;
+      }
+      
+      this.cases.set(caseId, case_);
+      return case_;
+    }
+    return undefined;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await db.select().from(users).where(eq(users.id, parseInt(id)));
     return user || undefined;
   }
 
@@ -246,7 +279,24 @@ export class DatabaseStorage implements IStorage {
   async assignExpertToCase(caseId: number, expertName: string | null): Promise<Case | undefined> {
     const [updatedCase] = await db
       .update(cases)
-      .set({ expertoAsignado: expertName })
+      .set({ 
+        expertoAsignado: expertName,
+        status: expertName ? "En revisión" : "Nuevo",
+        razonCambio: expertName ? "Experto asignado automáticamente" : null
+      })
+      .where(eq(cases.id, caseId))
+      .returning();
+    return updatedCase || undefined;
+  }
+
+  async updateCaseStatus(caseId: number, newStatus: string, razon?: string): Promise<Case | undefined> {
+    const [updatedCase] = await db
+      .update(cases)
+      .set({ 
+        status: newStatus,
+        razonCambio: razon || null,
+        reabierto: newStatus === "En revisión" ? true : undefined
+      })
       .where(eq(cases.id, caseId))
       .returning();
     return updatedCase || undefined;
