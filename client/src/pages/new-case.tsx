@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
+import aedipLogo from "@/assets/aedip-logo.svg";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CreateCaseData, SEX_OPTIONS, AGE_RANGE_OPTIONS, URGENCY_OPTIONS } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -87,19 +88,31 @@ export default function NewCase() {
   return (
     <>
       {/* Header */}
-      <div className="bg-medical-blue text-white px-6 py-4">
-        <div className="flex items-center mb-2">
-          <Button
-            onClick={handleCancel}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-blue-700 mr-3 p-2"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-xl font-semibold">Nuevo Caso</h1>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={handleCancel}
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-blue-700 p-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <img 
+              src={aedipLogo} 
+              alt="AEDIP" 
+              className="h-8 w-auto filter brightness-0 invert"
+            />
+            <div>
+              <h1 className="text-xl font-semibold">Nuevo Caso</h1>
+              <p className="text-blue-100 text-sm">
+                Sistema de consultas en inmunodeficiencias primarias
+              </p>
+            </div>
+          </div>
+          {user?.user && <UserBadge user={user.user} />}
         </div>
-        {user?.user && <UserBadge user={user.user} />}
       </div>
 
       {/* Form */}
