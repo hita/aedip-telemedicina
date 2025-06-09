@@ -1,0 +1,116 @@
+import { users, cases, type User, type InsertUser, type Case, type InsertCase } from "@shared/schema";
+
+export interface IStorage {
+  getUser(id: number): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  getCases(): Promise<Case[]>;
+  getCaseById(id: number): Promise<Case | undefined>;
+  createCase(case_: InsertCase): Promise<Case>;
+}
+
+export class MemStorage implements IStorage {
+  private users: Map<number, User>;
+  private cases: Map<number, Case>;
+  private currentUserId: number;
+  private currentCaseId: number;
+
+  constructor() {
+    this.users = new Map();
+    this.cases = new Map();
+    this.currentUserId = 1;
+    this.currentCaseId = 1;
+
+    // Initialize with hardcoded user
+    const defaultUser: User = {
+      id: 1,
+      email: "doctor@hospital.com",
+      password: "1234"
+    };
+    this.users.set(1, defaultUser);
+    this.currentUserId = 2;
+
+    // Initialize with sample cases
+    const sampleCases: Case[] = [
+      {
+        id: 1,
+        title: "Dolor abdominal persistente",
+        sex: "M",
+        ageRange: "36-50",
+        description: "Paciente presenta dolor abdominal en cuadrante superior derecho con irradiación a espalda. Síntomas iniciaron hace 3 días con intensidad progresiva.",
+        query: "¿Qué estudios diagnósticos recomendarían para descartar patología biliar? ¿Es necesario manejo ambulatorio u hospitalización?",
+        urgency: "Media",
+        status: "Nuevo",
+        createdAt: new Date("2024-11-15")
+      },
+      {
+        id: 2,
+        title: "Cefalea recurrente",
+        sex: "F",
+        ageRange: "19-35",
+        description: "Cefalea de características tensionales, bilateral, de 6 meses de evolución.",
+        query: "¿Qué protocolo de estudio recomiendan para cefalea crónica en paciente joven?",
+        urgency: "Baja",
+        status: "En revisión",
+        createdAt: new Date("2024-11-14")
+      },
+      {
+        id: 3,
+        title: "Evaluación cardiológica",
+        sex: "M",
+        ageRange: "51-65",
+        description: "Paciente con antecedentes de hipertensión arterial, solicita evaluación cardiológica preventiva.",
+        query: "¿Qué estudios cardiológicos básicos recomiendan para screening en paciente hipertenso?",
+        urgency: "Baja",
+        status: "Resuelto",
+        createdAt: new Date("2024-11-12")
+      }
+    ];
+
+    sampleCases.forEach(case_ => {
+      this.cases.set(case_.id, case_);
+    });
+    this.currentCaseId = 4;
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = this.currentUserId++;
+    const user: User = { ...insertUser, id };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async getCases(): Promise<Case[]> {
+    return Array.from(this.cases.values()).sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async getCaseById(id: number): Promise<Case | undefined> {
+    return this.cases.get(id);
+  }
+
+  async createCase(insertCase: InsertCase): Promise<Case> {
+    const id = this.currentCaseId++;
+    const case_: Case = { 
+      ...insertCase, 
+      id, 
+      status: "Nuevo",
+      createdAt: new Date()
+    };
+    this.cases.set(id, case_);
+    return case_;
+  }
+}
+
+export const storage = new MemStorage();
