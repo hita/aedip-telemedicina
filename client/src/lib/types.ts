@@ -12,8 +12,28 @@ export interface Case {
   razonCambio?: string | null;
   reabierto?: boolean;
   historialEstados?: any[];
+  ultimoMensaje?: {
+    fecha: string;
+    autor: string;
+    preview: string;
+  } | null;
+  mensajesNoLeidos?: Record<string, number>;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Message {
+  id: number;
+  caseId: number;
+  autorNombre: string;
+  autorRol: string;
+  contenido: string;
+  fechaEnvio: string;
+  leido: boolean;
+}
+
+export interface CreateMessageData {
+  contenido: string;
 }
 
 export interface CreateCaseData {

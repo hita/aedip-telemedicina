@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { UrgencyIndicator } from "@/components/urgency-indicator";
+import { CaseChat } from "@/components/case-chat";
 import { Case, STATUS_COLORS, SEX_OPTIONS, AGE_RANGE_OPTIONS } from "@/lib/types";
 
 export default function CaseDetail() {
@@ -173,10 +174,12 @@ export default function CaseDetail() {
           </div>
         </div>
 
-        {/* Future: Chat section would go here */}
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
-          <p className="text-secondary text-sm">Sistema de consultas en desarrollo</p>
-        </div>
+        {/* Chat Section */}
+        <CaseChat 
+          caseId={case_.id} 
+          userRole={user?.user?.rol || ""} 
+          userName={user?.user?.nombre || ""} 
+        />
       </div>
     </>
   );

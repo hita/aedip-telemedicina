@@ -9,6 +9,7 @@ import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { CaseFilterBar } from "@/components/case-filter-bar";
 import { UrgencyIndicator } from "@/components/urgency-indicator";
+import { UnreadMessagesBadge } from "@/components/unread-messages-badge";
 import { Case, STATUS_COLORS, sortCases } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";

@@ -189,6 +189,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get messages for a case
+  app.get("/api/cases/:id/messages", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user) {
+        return res.status(401).json({ message: "Usuario no encontrado" });
+      }
+
+      const caseId = parseInt(req.params.id);
+      
+      // Verify user has access to this case
+      const case_ = await storage.getCaseById(caseId);
+      if (!case_) {
+        return res.status(404).json({ message: "Caso no encontrado" });
+      }
+
+      // Check if user is creator or assigned expert
+      const hasAccess = case_.creadoPor === user.nombre || case_.expertoAsignado === user.nombre;
+      if (!hasAccess) {
+        return res.status(403).json({ message: "No tienes acceso a este caso" });
+      }
+
+      const messages = await storage.getMessagesByCaseId(caseId);
+      
+      // Mark messages as read for this user
+      await storage.markMessagesAsRead(caseId, user.email);
+      
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ message: "Error al obtener mensajes" });
+    }
+  });
+
+  // Create a new message
+  app.post("/api/cases/:id/messages", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user) {
+        return res.status(401).json({ message: "Usuario no encontrado" });
+      }
+
+      const caseId = parseInt(req.params.id);
+      
+      // Verify user has access to this case
+      const case_ = await storage.getCaseById(caseId);
+      if (!case_) {
+        return res.status(404).json({ message: "Caso no encontrado" });
+      }
+
+      // Check if user is creator or assigned expert
+      const hasAccess = case_.creadoPor === user.nombre || case_.expertoAsignado === user.nombre;
+      if (!hasAccess) {
+        return res.status(403).json({ message: "No tienes acceso a este caso" });
+      }
+
+      const { contenido } = req.body;
+      
+      if (!contenido?.trim()) {
+        return res.status(400).json({ message: "El contenido del mensaje es requerido" });
+      }
+
+      const messageData = insertMessageSchema.parse({
+        caseId,
+        autorNombre: user.nombre,
+        autorRol: user.rol,
+        contenido: contenido.trim()
+      });
+
+      const newMessage = await storage.createMessage(messageData);
+      res.json(newMessage);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Datos inválidos", errors: error.errors });
+      }
+      res.status(500).json({ message: "Error al crear mensaje" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
