@@ -107,7 +107,7 @@ export default function Dashboard() {
             />
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-light text-gray-900 tracking-tight">
-              {user?.user?.rol === "experto" ? "Expert Panel" : "Cases"}
+              {user?.user?.rol === "experto" ? "Panel de Experto" : "Casos"}
             </h1>
           </div>
           {user?.user && <UserBadge user={user.user} />}

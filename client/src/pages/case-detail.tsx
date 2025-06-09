@@ -105,7 +105,7 @@ export default function CaseDetail() {
             />
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-light text-gray-900 tracking-tight">
-              Case Details
+              Detalle del Caso
             </h1>
           </div>
           {user?.user && <UserBadge user={user.user} />}
