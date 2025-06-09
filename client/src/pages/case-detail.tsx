@@ -3,6 +3,7 @@ import { useLocation, useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { UserBadge } from "@/components/user-badge";
 import { Case, STATUS_COLORS, SEX_OPTIONS, AGE_RANGE_OPTIONS } from "@/lib/types";
 
 export default function CaseDetail() {
@@ -14,7 +15,7 @@ export default function CaseDetail() {
     enabled: !!id,
   });
 
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<{user: {id: number, email: string}}>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
@@ -82,7 +83,7 @@ export default function CaseDetail() {
     <>
       {/* Header */}
       <div className="bg-medical-blue text-white px-6 py-4">
-        <div className="flex items-center">
+        <div className="flex items-center mb-2">
           <Button
             onClick={handleBack}
             variant="ghost"
@@ -93,6 +94,7 @@ export default function CaseDetail() {
           </Button>
           <h1 className="text-xl font-semibold">Detalle del Caso</h1>
         </div>
+        {user && <UserBadge user={user.user} />}
       </div>
 
       {/* Case Detail Content */}

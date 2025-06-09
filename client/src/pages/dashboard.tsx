@@ -10,7 +10,7 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
 
   // Check authentication
-  const { data: user, isLoading: userLoading } = useQuery({
+  const { data: user, isLoading: userLoading } = useQuery<{user: {id: number, email: string}}>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
@@ -58,7 +58,7 @@ export default function Dashboard() {
         <div className="mb-2">
           <h1 className="text-xl font-semibold">Panel de Casos</h1>
         </div>
-        {user && <UserBadge user={user} />}
+        {user?.user && <UserBadge user={user.user} />}
       </div>
 
       {/* Cases List */}

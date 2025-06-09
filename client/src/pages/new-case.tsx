@@ -29,7 +29,7 @@ export default function NewCase() {
   const { toast } = useToast();
 
   // Check authentication
-  const { data: user } = useQuery({
+  const { data: user } = useQuery<{user: {id: number, email: string}}>({
     queryKey: ["/api/auth/me"],
     retry: false,
   });
@@ -99,7 +99,7 @@ export default function NewCase() {
           </Button>
           <h1 className="text-xl font-semibold">Nuevo Caso</h1>
         </div>
-        {user && <UserBadge user={user} />}
+        {user && <UserBadge user={user.user} />}
       </div>
 
       {/* Form */}
