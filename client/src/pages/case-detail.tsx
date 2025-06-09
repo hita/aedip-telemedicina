@@ -151,6 +151,21 @@ export default function CaseDetail() {
                 <p className="font-medium">{case_.expertoAsignado || "Sin asignar"}</p>
               </div>
             </div>
+
+            {/* Show reason for status change when case is resolved or canceled */}
+            {(case_.status === "Resuelto" || case_.status === "Cancelado") && case_.razonCambio && (
+              <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                <p className="text-sm text-secondary mb-1">
+                  {case_.status === "Resuelto" ? "Motivo de resolución:" : "Motivo de cancelación:"}
+                </p>
+                <p className="text-sm font-medium">{case_.razonCambio}</p>
+                {case_.reabierto && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    Este caso ha sido reabierto
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

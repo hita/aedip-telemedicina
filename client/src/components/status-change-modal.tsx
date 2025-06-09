@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -77,6 +77,9 @@ export function StatusChangeModal({ case_, userRole, isOpen, onClose }: StatusCh
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Cambiar Estado del Caso</DialogTitle>
+          <DialogDescription>
+            Selecciona el nuevo estado y proporciona una razón para el cambio.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">

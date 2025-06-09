@@ -84,6 +84,15 @@ export const RAZONES_EXPERTO = {
     'Requiere evaluación presencial urgente',
     'Datos contradictorios o incompletos',
     'Caso requiere otro tipo de especialista'
+  ],
+  "en revisión": [
+    'Nueva información clínica disponible',
+    'Requiere segunda evaluación inmunológica',
+    'Resultados de laboratorio adicionales recibidos',
+    'Evolución clínica inesperada del paciente',
+    'Solicitud de médico tratante para reevaluación',
+    'Caso marcado incorrectamente como cerrado',
+    'Aparición de nuevos síntomas relacionados'
   ]
 };
 
