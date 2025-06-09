@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", async (req: any, res) => {
     try {
       const { email, password } = req.body;
       
@@ -20,8 +20,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Credenciales incorrectas" });
       }
 
-      // Simple session - in production, use proper session management
-      req.session = { userId: user.id };
+      // Store user ID in session
+      req.session.userId = user.id;
       
       res.json({ user: { id: user.id, email: user.email } });
     } catch (error) {
@@ -29,12 +29,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/logout", (req, res) => {
-    req.session = null;
-    res.json({ message: "Sesión cerrada exitosamente" });
+  app.post("/api/auth/logout", (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        return res.status(500).json({ message: "Error al cerrar sesión" });
+      }
+      res.json({ message: "Sesión cerrada exitosamente" });
+    });
   });
 
-  app.get("/api/auth/me", async (req, res) => {
+  app.get("/api/auth/me", async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ message: "No autenticado" });
@@ -52,7 +56,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cases
-  app.get("/api/cases", async (req, res) => {
+  app.get("/api/cases", async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ message: "No autenticado" });
@@ -65,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/cases/:id", async (req, res) => {
+  app.get("/api/cases/:id", async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ message: "No autenticado" });
@@ -87,7 +91,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/cases", async (req, res) => {
+  app.post("/api/cases", async (req: any, res) => {
     try {
       if (!req.session?.userId) {
         return res.status(401).json({ message: "No autenticado" });
