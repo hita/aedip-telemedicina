@@ -55,15 +55,18 @@ export default function Login() {
         {/* Header with AEDIP Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <img 
-              src={aedipLogo} 
-              alt="AEDIP - Asociación Española de Inmunodeficiencias Primarias" 
+            <img
+              src={aedipLogo}
+              alt="AEDIP - Asociación Española de Inmunodeficiencias Primarias"
               className="h-20 w-auto filter brightness-0 saturate-0"
-              style={{filter: 'brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)'}}
+              style={{
+                filter:
+                  "brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)",
+              }}
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Plataforma de Consultas
+            Plataforma de Consultas de AEDIP
           </h1>
           <p className="text-gray-600 text-sm">
             Sistema especializado en inmunodeficiencias primarias
@@ -86,7 +89,9 @@ export default function Login() {
                   placeholder="doctor@hospital.com"
                 />
                 {errors.email && (
-                  <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -102,13 +107,20 @@ export default function Login() {
                   placeholder="1234"
                 />
                 {errors.password && (
-                  <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
+                  <p className="text-sm text-red-600 mt-1">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
 
               {error && (
-                <Alert variant="destructive" className="bg-red-50 border-red-200">
-                  <AlertDescription className="text-red-800">{error}</AlertDescription>
+                <Alert
+                  variant="destructive"
+                  className="bg-red-50 border-red-200"
+                >
+                  <AlertDescription className="text-red-800">
+                    {error}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -117,7 +129,9 @@ export default function Login() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 transition-colors"
                 disabled={loginMutation.isPending}
               >
-                {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar Sesión"}
+                {loginMutation.isPending
+                  ? "Iniciando sesión..."
+                  : "Iniciar Sesión"}
               </Button>
             </form>
           </CardContent>
@@ -135,14 +149,18 @@ export default function Login() {
                   ¿Necesitas acceso como profesional sanitario?
                 </h3>
                 <p className="text-gray-700 text-sm leading-relaxed mb-4">
-                  Si eres un profesional sanitario y necesitas acceso directo a nuestros expertos 
-                  en inmunodeficiencias primarias, contáctanos para obtener credenciales de acceso inmediato.
+                  Si eres un profesional sanitario y necesitas acceso directo a
+                  nuestros expertos en inmunodeficiencias primarias, contáctanos
+                  para obtener credenciales de acceso inmediato.
                 </p>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                  <p className="text-blue-800 text-xs font-medium mb-1">🔒 Anonimato Garantizado</p>
+                  <p className="text-blue-800 text-xs font-medium mb-1">
+                    🔒 Anonimato Garantizado
+                  </p>
                   <p className="text-blue-700 text-xs leading-relaxed">
-                    AEDIP actúa como intermediario para proteger tu identidad. Los expertos no pueden 
-                    ver tu nombre, email ni datos personales. Todas las consultas son completamente anónimas.
+                    AEDIP actúa como intermediario para proteger tu identidad.
+                    Los expertos no pueden ver tu nombre, email ni datos
+                    personales. Todas las consultas son completamente anónimas.
                   </p>
                 </div>
               </div>
@@ -152,14 +170,15 @@ export default function Login() {
               <div className="flex items-center space-x-3">
                 <Clock className="w-4 h-4 text-blue-600 flex-shrink-0" />
                 <span className="text-sm text-gray-700">
-                  <span className="font-medium">Horario:</span> Lunes a viernes, 15:00 - 17:00h
+                  <span className="font-medium">Horario:</span> Lunes a viernes,
+                  15:00 - 17:00h
                 </span>
               </div>
 
               <div className="flex items-center space-x-3">
                 <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                <a 
-                  href="tel:913923855" 
+                <a
+                  href="tel:913923855"
                   className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
                 >
                   91 392 38 55
@@ -168,8 +187,8 @@ export default function Login() {
 
               <div className="flex items-center space-x-3">
                 <Mail className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                <a 
-                  href="mailto:expertos@aedip.com" 
+                <a
+                  href="mailto:expertos@aedip.com"
                   className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
                 >
                   expertos@aedip.com
@@ -182,13 +201,17 @@ export default function Login() {
         {/* Test Users */}
         <Card className="mt-4 bg-gray-50 border-gray-200">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-600 mb-3 font-medium">Usuarios de prueba:</p>
+            <p className="text-xs text-gray-600 mb-3 font-medium">
+              Usuarios de prueba:
+            </p>
             <div className="space-y-2 text-xs text-gray-600">
               <div>
-                <span className="font-medium text-gray-800">Médico:</span> doctor@hospital.com / 1234
+                <span className="font-medium text-gray-800">Médico:</span>{" "}
+                doctor@hospital.com / 1234
               </div>
               <div>
-                <span className="font-medium text-gray-800">Experto:</span> experto@hospital.com / 1234
+                <span className="font-medium text-gray-800">Experto:</span>{" "}
+                experto@hospital.com / 1234
               </div>
             </div>
           </CardContent>

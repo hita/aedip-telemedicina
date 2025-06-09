@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -22,14 +23,27 @@ function Router() {
   );
 }
 
+function AppContent() {
+  const { data: user } = useQuery<{user: {id: number, email: string, rol: string, nombre: string}}>({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+
+  const isExpert = user?.user?.rol === "experto";
+  
+  return (
+    <div className={`min-h-screen bg-white ${isExpert ? 'w-full' : 'max-w-md mx-auto shadow-lg'}`}>
+      <Toaster />
+      <Router />
+    </div>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen max-w-md mx-auto bg-white shadow-lg">
-          <Toaster />
-          <Router />
-        </div>
+        <AppContent />
       </TooltipProvider>
     </QueryClientProvider>
   );
