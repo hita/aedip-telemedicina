@@ -137,6 +137,13 @@ export default function Login() {
                   Si eres un profesional sanitario y necesitas acceso directo a nuestros expertos 
                   en inmunodeficiencias primarias, contáctanos para obtener credenciales de acceso inmediato.
                 </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <p className="text-blue-800 text-xs font-medium mb-1">🔒 Anonimato Garantizado</p>
+                  <p className="text-blue-700 text-xs leading-relaxed">
+                    AEDIP actúa como intermediario para proteger tu identidad. Los expertos no pueden 
+                    ver tu nombre, email ni datos personales. Todas las consultas son completamente anónimas.
+                  </p>
+                </div>
               </div>
             </div>
 

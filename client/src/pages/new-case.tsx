@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
@@ -16,6 +17,10 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CreateCaseData, SEX_OPTIONS, AGE_RANGE_OPTIONS, URGENCY_OPTIONS } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
+type CreateCaseFormData = CreateCaseData & {
+  dataAnonymized: boolean;
+};
+
 const caseSchema = z.object({
   title: z.string().min(1, "El título es obligatorio"),
   sex: z.string().min(1, "El sexo es requerido"),
@@ -23,6 +28,9 @@ const caseSchema = z.object({
   description: z.string().optional(),
   query: z.string().min(1, "La consulta médica es obligatoria"),
   urgency: z.string().min(1, "El nivel de urgencia es requerido"),
+  dataAnonymized: z.boolean().refine(val => val === true, {
+    message: "Debe confirmar que ha anonimizado los datos del paciente",
+  }),
 });
 
 export default function NewCase() {
@@ -42,7 +50,7 @@ export default function NewCase() {
     setValue,
     watch,
     reset,
-  } = useForm<CreateCaseData>({
+  } = useForm<CreateCaseFormData>({
     resolver: zodResolver(caseSchema),
     defaultValues: {
       title: "",
@@ -51,6 +59,7 @@ export default function NewCase() {
       description: "",
       query: "",
       urgency: "",
+      dataAnonymized: false,
     },
   });
 
@@ -233,6 +242,31 @@ export default function NewCase() {
             </Select>
             {errors.urgency && (
               <p className="text-sm text-red-600 mt-1">{errors.urgency.message}</p>
+            )}
+          </div>
+
+          {/* Data Anonymization Confirmation */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="dataAnonymized"
+                checked={watch("dataAnonymized")}
+                onCheckedChange={(checked) => setValue("dataAnonymized", checked as boolean)}
+                className="mt-1"
+              />
+              <div className="flex-1">
+                <Label htmlFor="dataAnonymized" className="text-amber-800 font-medium text-sm cursor-pointer">
+                  Confirmación de anonimización de datos *
+                </Label>
+                <p className="text-amber-700 text-xs mt-1 leading-relaxed">
+                  Confirmo que he eliminado o anonimizado todos los datos personales del paciente 
+                  (nombre, apellidos, número de historia clínica, fechas específicas, etc.) de la 
+                  consulta médica. La información no contiene datos que permitan identificar al paciente.
+                </p>
+              </div>
+            </div>
+            {errors.dataAnonymized && (
+              <p className="text-sm text-red-600 mt-2 ml-6">{errors.dataAnonymized.message}</p>
             )}
           </div>
 
