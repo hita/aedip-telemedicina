@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
-import aedipLogo from "@/assets/aedip-logo.svg";
+import aedipLogo from "@/assets/aedip-logo-oficial.png";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { UrgencyIndicator } from "@/components/urgency-indicator";
 import { CaseChat } from "@/components/case-chat";
@@ -100,7 +100,7 @@ export default function CaseDetail() {
             <img 
               src={aedipLogo} 
               alt="AEDIP" 
-              className="h-8 w-auto filter brightness-0 invert"
+              className="h-10 w-auto filter brightness-0 invert"
             />
             <div>
               <h1 className="text-xl font-semibold">Detalle del Caso</h1>

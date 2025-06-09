@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
-import aedipLogo from "@/assets/aedip-logo.svg";
+import aedipLogo from "@/assets/aedip-logo-oficial.png";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CreateCaseData, SEX_OPTIONS, AGE_RANGE_OPTIONS, URGENCY_OPTIONS } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -113,7 +113,7 @@ export default function NewCase() {
             <img 
               src={aedipLogo} 
               alt="AEDIP" 
-              className="h-8 w-auto filter brightness-0 invert"
+              className="h-10 w-auto filter brightness-0 invert"
             />
             <div>
               <h1 className="text-xl font-semibold">Nuevo Caso</h1>

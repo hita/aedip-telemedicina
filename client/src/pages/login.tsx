@@ -11,7 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Phone, Mail, Clock, Users } from "lucide-react";
 import { authApi, type LoginCredentials } from "@/lib/auth";
-import aedipLogo from "@/assets/aedip-logo.svg";
+import aedipLogo from "@/assets/aedip-logo-oficial.png";
 
 const loginSchema = z.object({
   email: z.string().email("Correo electrónico inválido"),
@@ -58,7 +58,8 @@ export default function Login() {
             <img 
               src={aedipLogo} 
               alt="AEDIP - Asociación Española de Inmunodeficiencias Primarias" 
-              className="h-16 w-auto"
+              className="h-20 w-auto filter brightness-0 saturate-0"
+              style={{filter: 'brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)'}}
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">

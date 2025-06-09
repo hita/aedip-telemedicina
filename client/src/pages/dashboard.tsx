@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, UserPlus, UserMinus, AlertCircle } from "lucide-react";
-import aedipLogo from "@/assets/aedip-logo.svg";
+import aedipLogo from "@/assets/aedip-logo-oficial.png";
 import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { CaseFilterBar } from "@/components/case-filter-bar";
@@ -102,7 +102,7 @@ export default function Dashboard() {
             <img 
               src={aedipLogo} 
               alt="AEDIP" 
-              className="h-10 w-auto filter brightness-0 invert"
+              className="h-12 w-auto filter brightness-0 invert"
             />
             <div>
               <h1 className="text-xl font-semibold">
