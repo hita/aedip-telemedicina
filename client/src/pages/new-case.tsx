@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, CheckCircle } from "lucide-react";
+import { UserBadge } from "@/components/user-badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CreateCaseData, SEX_OPTIONS, AGE_RANGE_OPTIONS, URGENCY_OPTIONS } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +27,12 @@ const caseSchema = z.object({
 export default function NewCase() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+
+  // Check authentication
+  const { data: user } = useQuery({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
 
   const {
     register,
@@ -81,7 +88,7 @@ export default function NewCase() {
     <>
       {/* Header */}
       <div className="bg-medical-blue text-white px-6 py-4">
-        <div className="flex items-center">
+        <div className="flex items-center mb-2">
           <Button
             onClick={handleCancel}
             variant="ghost"
@@ -92,6 +99,7 @@ export default function NewCase() {
           </Button>
           <h1 className="text-xl font-semibold">Nuevo Caso</h1>
         </div>
+        {user && <UserBadge user={user} />}
       </div>
 
       {/* Form */}

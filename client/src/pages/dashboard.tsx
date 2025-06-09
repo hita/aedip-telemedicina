@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { LogOut, Plus } from "lucide-react";
-import { authApi } from "@/lib/auth";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Plus } from "lucide-react";
+import { UserBadge } from "@/components/user-badge";
 import { Case, STATUS_COLORS } from "@/lib/types";
 
 export default function Dashboard() {
@@ -22,23 +21,11 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  const logoutMutation = useMutation({
-    mutationFn: authApi.logout,
-    onSuccess: () => {
-      queryClient.clear();
-      setLocation("/login");
-    },
-  });
-
   useEffect(() => {
     if (!userLoading && !user) {
       setLocation("/login");
     }
   }, [user, userLoading, setLocation]);
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -68,18 +55,10 @@ export default function Dashboard() {
     <>
       {/* Header */}
       <div className="bg-medical-blue text-white px-6 py-4">
-        <div className="flex items-center justify-between">
+        <div className="mb-2">
           <h1 className="text-xl font-semibold">Panel de Casos</h1>
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-blue-700"
-            disabled={logoutMutation.isPending}
-          >
-            <LogOut className="w-5 h-5" />
-          </Button>
         </div>
+        {user && <UserBadge user={user} />}
       </div>
 
       {/* Cases List */}
