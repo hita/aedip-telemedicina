@@ -48,6 +48,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
 
 export const insertCaseSchema = createInsertSchema(cases).omit({
   id: true,
+  hashId: true,
   status: true,
   createdAt: true,
   creadoPor: true,

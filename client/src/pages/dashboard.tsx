@@ -115,7 +115,7 @@ export default function Dashboard() {
       </div>
 
       {/* Cases List */}
-      <div className="px-6 py-4">
+      <div className={`py-4 ${user?.user?.rol === "experto" ? "px-6 max-w-7xl mx-auto" : "px-6"}`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-medium">
             {user?.user?.rol === "experto" ? "Todos los Casos del Sistema" : "Mis Casos"}
@@ -169,12 +169,17 @@ export default function Dashboard() {
             )}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className={user?.user?.rol === "experto" 
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+            : "space-y-4"
+          }>
             {filteredCases.map((case_) => (
               <div
                 key={case_.id}
                 onClick={() => viewCaseDetail(case_.id)}
-                className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-lg hover:border-medical-blue/40 transition-all duration-300 group"
+                className={`bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-lg hover:border-medical-blue/40 transition-all duration-300 group ${
+                  user?.user?.rol === "experto" ? "h-fit" : ""
+                }`}
               >
                 {/* Header with title and status */}
                 <div className="flex items-start justify-between mb-4">
@@ -183,6 +188,9 @@ export default function Dashboard() {
                       <h3 className="font-semibold text-lg text-gray-900 truncate group-hover:text-medical-blue transition-colors">
                         {case_.title}
                       </h3>
+                      <span className="px-2 py-1 text-xs font-mono bg-gray-100 text-gray-600 rounded">
+                        {case_.hashId || `#${case_.id}`}
+                      </span>
                       <UnreadMessagesBadge case_={case_} userEmail={user?.user?.email || ""} />
                     </div>
                     <div className="flex items-center gap-3">
@@ -200,7 +208,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-4 text-gray-600">
                     <span>
-                      Por {user?.user?.rol === "experto" ? "Médico Anónimo" : case_.creadoPor}
+                      Por {case_.creadoPor}
                     </span>
                     {case_.expertoAsignado && (
                       <>

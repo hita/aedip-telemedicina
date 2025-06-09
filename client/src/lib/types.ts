@@ -1,5 +1,6 @@
 export interface Case {
   id: number;
+  hashId: string;
   title: string;
   sex: string;
   ageRange: string;

@@ -232,8 +232,10 @@ export class MemStorage implements IStorage {
 
   async createCase(insertCase: InsertCase, creadoPor: string): Promise<Case> {
     const id = this.currentCaseId++;
+    const hashId = AuthUtils.generateCaseHashId();
     const case_: Case = { 
       id, 
+      hashId,
       title: insertCase.title,
       sex: insertCase.sex,
       ageRange: insertCase.ageRange,
