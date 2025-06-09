@@ -99,7 +99,7 @@ export default function NewCase() {
           </Button>
           <h1 className="text-xl font-semibold">Nuevo Caso</h1>
         </div>
-        {user && <UserBadge user={user.user} />}
+        {user?.user && <UserBadge user={user.user} />}
       </div>
 
       {/* Form */}

@@ -94,7 +94,7 @@ export default function CaseDetail() {
           </Button>
           <h1 className="text-xl font-semibold">Detalle del Caso</h1>
         </div>
-        {user && <UserBadge user={user.user} />}
+        {user?.user && <UserBadge user={user.user} />}
       </div>
 
       {/* Case Detail Content */}
