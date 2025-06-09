@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, UserPlus, UserMinus, AlertCircle } from "lucide-react";
+import aedipLogo from "@/assets/aedip-logo.svg";
 import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { CaseFilterBar } from "@/components/case-filter-bar";
@@ -95,13 +96,25 @@ export default function Dashboard() {
   return (
     <>
       {/* Header */}
-      <div className="bg-medical-blue text-white px-6 py-4">
-        <div className="mb-2">
-          <h1 className="text-xl font-semibold">
-            {user?.user?.rol === "experto" ? "Panel de Experto" : "Panel de Casos"}
-          </h1>
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-4">
+            <img 
+              src={aedipLogo} 
+              alt="AEDIP" 
+              className="h-10 w-auto filter brightness-0 invert"
+            />
+            <div>
+              <h1 className="text-xl font-semibold">
+                {user?.user?.rol === "experto" ? "Panel de Experto" : "Panel de Casos"}
+              </h1>
+              <p className="text-blue-100 text-sm">
+                Sistema de consultas en inmunodeficiencias primarias
+              </p>
+            </div>
+          </div>
+          {user?.user && <UserBadge user={user.user} />}
         </div>
-        {user?.user && <UserBadge user={user.user} />}
       </div>
 
       {/* Cases List */}
