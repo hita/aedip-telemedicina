@@ -71,11 +71,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let cases;
       if (user.rol === "experto") {
-        // Expertos ven todos los casos
+        // Expertos ven todos los casos con nicknames anónimos
         cases = await storage.getCases();
       } else {
-        // Médicos solo ven sus casos
-        cases = await storage.getCasesByCreator(user.nombre);
+        // Médicos solo ven sus casos - usar nickname anónimo para buscar
+        const searchName = user.nicknameAnonimo || user.nombre;
+        cases = await storage.getCasesByCreator(searchName);
       }
       
       res.json(cases);
@@ -118,7 +119,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const validatedData = insertCaseSchema.parse(req.body);
-      const case_ = await storage.createCase(validatedData, user.nombre);
+      // Use anonymous nickname for medicos when creating cases
+      const creatorName = user.nicknameAnonimo || user.nombre;
+      const case_ = await storage.createCase(validatedData, creatorName);
       
       res.status(201).json(case_);
     } catch (error) {
@@ -212,7 +215,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user is creator or assigned expert
-      const hasAccess = case_.creadoPor === user.nombre || case_.expertoAsignado === user.nombre;
+      const userIdentifier = user.nicknameAnonimo || user.nombre;
+      const hasAccess = case_.creadoPor === userIdentifier || case_.expertoAsignado === user.nombre;
       if (!hasAccess) {
         return res.status(403).json({ message: "No tienes acceso a este caso" });
       }
@@ -249,7 +253,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user is creator or assigned expert
-      const hasAccess = case_.creadoPor === user.nombre || case_.expertoAsignado === user.nombre;
+      const userIdentifier = user.nicknameAnonimo || user.nombre;
+      const hasAccess = case_.creadoPor === userIdentifier || case_.expertoAsignado === user.nombre;
       if (!hasAccess) {
         return res.status(403).json({ message: "No tienes acceso a este caso" });
       }
@@ -262,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const messageData = insertMessageSchema.parse({
         caseId,
-        autorNombre: user.nombre,
+        autorNombre: userIdentifier,
         autorRol: user.rol,
         contenido: contenido.trim()
       });

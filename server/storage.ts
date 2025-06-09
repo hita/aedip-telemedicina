@@ -174,11 +174,18 @@ export class MemStorage implements IStorage {
     const id = this.currentUserId++;
     // Hash the password before storing
     const hashedPassword = await AuthUtils.hashPassword(insertUser.password);
+    // Generate anonymous nickname for medicos
+    const nicknameAnonimo = insertUser.rol === "medico" 
+      ? AuthUtils.generateAnonymousNickname(insertUser.nombre, insertUser.email)
+      : null;
+    
     const user: User = { 
-      ...insertUser, 
       id,
+      email: insertUser.email,
       password: hashedPassword,
-      rol: insertUser.rol || "medico"
+      rol: insertUser.rol || "medico",
+      nombre: insertUser.nombre,
+      nicknameAnonimo
     };
     this.users.set(id, user);
     return user;
