@@ -3,12 +3,14 @@ import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getCases(): Promise<Case[]>;
+  getCasesByCreator(creatorName: string): Promise<Case[]>;
   getCaseById(id: number): Promise<Case | undefined>;
   createCase(case_: InsertCase, creadoPor: string): Promise<Case>;
+  assignExpertToCase(caseId: number, expertName: string | null): Promise<Case | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -106,8 +108,8 @@ export class MemStorage implements IStorage {
     this.currentCaseId = 5;
   }
 
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(parseInt(id));
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
@@ -131,6 +133,22 @@ export class MemStorage implements IStorage {
     return Array.from(this.cases.values()).sort((a, b) => 
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
+  }
+
+  async getCasesByCreator(creatorName: string): Promise<Case[]> {
+    return Array.from(this.cases.values())
+      .filter(case_ => case_.creadoPor === creatorName)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async assignExpertToCase(caseId: number, expertName: string | null): Promise<Case | undefined> {
+    const case_ = this.cases.get(caseId);
+    if (case_) {
+      case_.expertoAsignado = expertName;
+      this.cases.set(caseId, case_);
+      return case_;
+    }
+    return undefined;
   }
 
   async getCaseById(id: number): Promise<Case | undefined> {
@@ -158,8 +176,8 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id.toString()));
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
@@ -177,7 +195,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCases(): Promise<Case[]> {
-    return await db.select().from(cases).orderBy(cases.createdAt);
+    // Sort by status (Nuevo first) then by date descending
+    const allCases = await db.select().from(cases);
+    return allCases.sort((a, b) => {
+      if (a.status === "Nuevo" && b.status !== "Nuevo") return -1;
+      if (a.status !== "Nuevo" && b.status === "Nuevo") return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+
+  async getCasesByCreator(creatorName: string): Promise<Case[]> {
+    const userCases = await db.select().from(cases).where(eq(cases.creadoPor, creatorName));
+    return userCases.sort((a, b) => {
+      if (a.status === "Nuevo" && b.status !== "Nuevo") return -1;
+      if (a.status !== "Nuevo" && b.status === "Nuevo") return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
   }
 
   async getCaseById(id: number): Promise<Case | undefined> {
@@ -196,6 +229,15 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return case_;
+  }
+
+  async assignExpertToCase(caseId: number, expertName: string | null): Promise<Case | undefined> {
+    const [updatedCase] = await db
+      .update(cases)
+      .set({ expertoAsignado: expertName })
+      .where(eq(cases.id, caseId))
+      .returning();
+    return updatedCase || undefined;
   }
 }
 
