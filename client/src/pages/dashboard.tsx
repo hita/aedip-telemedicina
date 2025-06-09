@@ -96,9 +96,21 @@ export default function Dashboard() {
           <h2 className="text-lg font-medium">
             {user?.user?.rol === "experto" ? "Todos los Casos del Sistema" : "Mis Casos"}
           </h2>
-          <span className="text-sm text-secondary">
-            {cases.length} casos
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-secondary">
+              {cases.length} casos
+            </span>
+            {user?.user?.rol !== "experto" && (
+              <Button
+                onClick={() => setLocation("/nuevo-caso")}
+                className="bg-medical-blue hover:bg-blue-700 text-white"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nuevo Caso
+              </Button>
+            )}
+          </div>
         </div>
 
         {cases.length === 0 ? (
