@@ -157,8 +157,8 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* Alert for experts when case is unassigned */}
-                {user?.user?.rol === "experto" && !case_.expertoAsignado && (
+                {/* Alert for experts when case is unassigned and needs attention */}
+                {user?.user?.rol === "experto" && !case_.expertoAsignado && case_.status === "Nuevo" && (
                   <Alert className="mb-3 border-orange-200 bg-orange-50">
                     <AlertCircle className="h-4 w-4 text-orange-600" />
                     <AlertDescription className="text-orange-800">
@@ -221,17 +221,6 @@ export default function Dashboard() {
             ))}
           </div>
         )}
-      </div>
-
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6">
-        <Button
-          onClick={() => setLocation("/nuevo-caso")}
-          className="w-14 h-14 bg-medical-blue hover:bg-blue-700 text-white rounded-full shadow-lg"
-          size="icon"
-        >
-          <Plus className="w-6 h-6" />
-        </Button>
       </div>
     </>
   );
