@@ -13,6 +13,7 @@ export interface Case {
   reabierto?: boolean;
   historialEstados?: any[];
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateCaseData {

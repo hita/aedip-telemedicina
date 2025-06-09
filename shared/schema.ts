@@ -25,6 +25,7 @@ export const cases = pgTable("cases", {
   reabierto: boolean("reabierto").default(false),
   historialEstados: jsonb("historial_estados").default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
