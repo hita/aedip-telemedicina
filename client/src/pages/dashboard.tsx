@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Plus, UserPlus, UserMinus, AlertCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
 import { Case, STATUS_COLORS } from "@/lib/types";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   // Check authentication
   const { data: user, isLoading: userLoading } = useQuery<{user: {id: number, email: string, rol: string, nombre: string}}>({
@@ -19,6 +24,28 @@ export default function Dashboard() {
   const { data: cases = [], isLoading: casesLoading } = useQuery<Case[]>({
     queryKey: ["/api/cases"],
     enabled: !!user,
+  });
+
+  // Assignment mutation for experts
+  const assignMutation = useMutation({
+    mutationFn: async ({ caseId, action }: { caseId: number; action: "assign" | "unassign" }) => {
+      const response = await apiRequest("PATCH", `/api/cases/${caseId}/assign`, { action });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/cases"] });
+      toast({
+        title: "Caso actualizado",
+        description: "La asignación se ha actualizado correctamente",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la asignación del caso",
+        variant: "destructive",
+      });
+    },
   });
 
   useEffect(() => {
@@ -81,15 +108,17 @@ export default function Dashboard() {
             </div>
             <h3 className="text-lg font-medium mb-2">No hay casos</h3>
             <p className="text-secondary mb-6">
-              Crea tu primer caso médico para comenzar
+              {user?.user?.rol === "experto" ? "No hay casos en el sistema" : "Crea tu primer caso médico para comenzar"}
             </p>
-            <Button
-              onClick={() => setLocation("/nuevo-caso")}
-              className="bg-medical-blue hover:bg-blue-700 text-white"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Caso
-            </Button>
+            {user?.user?.rol !== "experto" && (
+              <Button
+                onClick={() => setLocation("/nuevo-caso")}
+                className="bg-medical-blue hover:bg-blue-700 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Nuevo Caso
+              </Button>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
@@ -115,13 +144,67 @@ export default function Dashboard() {
                     <p>Experto: {case_.expertoAsignado}</p>
                   )}
                 </div>
-                <Button
-                  onClick={() => viewCaseDetail(case_.id)}
-                  variant="link"
-                  className="text-medical-blue p-0 h-auto font-medium hover:underline"
-                >
-                  Ver Detalles
-                </Button>
+
+                {/* Alert for experts when case is unassigned */}
+                {user?.user?.rol === "experto" && !case_.expertoAsignado && (
+                  <Alert className="mb-3 border-orange-200 bg-orange-50">
+                    <AlertCircle className="h-4 w-4 text-orange-600" />
+                    <AlertDescription className="text-orange-800">
+                      Este caso necesita ser atendido por un experto
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <Button
+                    onClick={() => viewCaseDetail(case_.id)}
+                    variant="link"
+                    className="text-medical-blue p-0 h-auto font-medium hover:underline"
+                  >
+                    Ver Detalles
+                  </Button>
+
+                  {/* Assignment buttons for experts */}
+                  {user?.user?.rol === "experto" && (
+                    <TooltipProvider>
+                      {!case_.expertoAsignado ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              onClick={() => assignMutation.mutate({ caseId: case_.id, action: "assign" })}
+                              variant="outline"
+                              size="sm"
+                              disabled={assignMutation.isPending}
+                              className="h-8 w-8 p-0"
+                            >
+                              <UserPlus className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Asignármelo a mis casos</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : case_.expertoAsignado === user?.user?.nombre ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              onClick={() => assignMutation.mutate({ caseId: case_.id, action: "unassign" })}
+                              variant="outline"
+                              size="sm"
+                              disabled={assignMutation.isPending}
+                              className="h-8 w-8 p-0"
+                            >
+                              <UserMinus className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Desasignarme de este caso</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : null}
+                    </TooltipProvider>
+                  )}
+                </div>
               </div>
             ))}
           </div>

@@ -62,7 +62,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "No autenticado" });
       }
 
-      const cases = await storage.getCases();
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user) {
+        return res.status(401).json({ message: "Usuario no encontrado" });
+      }
+
+      let cases;
+      if (user.rol === "experto") {
+        // Expertos ven todos los casos
+        cases = await storage.getCases();
+      } else {
+        // Médicos solo ven sus casos
+        cases = await storage.getCasesByCreator(user.nombre);
+      }
+      
       res.json(cases);
     } catch (error) {
       res.status(500).json({ message: "Error al obtener casos" });
@@ -114,6 +127,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       res.status(500).json({ message: "Error al crear caso" });
+    }
+  });
+
+  // Expert assignment route
+  app.patch("/api/cases/:id/assign", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "experto") {
+        return res.status(403).json({ message: "Solo expertos pueden asignar casos" });
+      }
+
+      const caseId = parseInt(req.params.id);
+      const { action } = req.body; // "assign" or "unassign"
+      
+      const expertName = action === "assign" ? user.nombre : null;
+      const updatedCase = await storage.assignExpertToCase(caseId, expertName);
+      
+      if (!updatedCase) {
+        return res.status(404).json({ message: "Caso no encontrado" });
+      }
+
+      res.json(updatedCase);
+    } catch (error) {
+      res.status(500).json({ message: "Error al asignar caso" });
     }
   });
 
