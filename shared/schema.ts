@@ -6,6 +6,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  rol: text("rol").notNull().default("medico"),
+  nombre: text("nombre").notNull(),
 });
 
 export const cases = pgTable("cases", {
@@ -17,6 +19,8 @@ export const cases = pgTable("cases", {
   query: text("query").notNull(),
   urgency: text("urgency").notNull(),
   status: text("status").notNull().default("Nuevo"),
+  expertoAsignado: text("experto_asignado"),
+  creadoPor: text("creado_por").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -28,6 +32,7 @@ export const insertCaseSchema = createInsertSchema(cases).omit({
   id: true,
   status: true,
   createdAt: true,
+  creadoPor: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

@@ -6,7 +6,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getCases(): Promise<Case[]>;
   getCaseById(id: number): Promise<Case | undefined>;
-  createCase(case_: InsertCase): Promise<Case>;
+  createCase(case_: InsertCase, creadoPor: string): Promise<Case>;
 }
 
 export class MemStorage implements IStorage {
@@ -21,14 +21,26 @@ export class MemStorage implements IStorage {
     this.currentUserId = 1;
     this.currentCaseId = 1;
 
-    // Initialize with hardcoded user
-    const defaultUser: User = {
+    // Initialize with hardcoded users
+    const medico: User = {
       id: 1,
       email: "doctor@hospital.com",
-      password: "1234"
+      password: "1234",
+      rol: "medico",
+      nombre: "Dr. García"
     };
-    this.users.set(1, defaultUser);
-    this.currentUserId = 2;
+    
+    const experto: User = {
+      id: 2,
+      email: "experto@hospital.com",
+      password: "1234",
+      rol: "experto",
+      nombre: "Dr. María Rodríguez"
+    };
+    
+    this.users.set(1, medico);
+    this.users.set(2, experto);
+    this.currentUserId = 3;
 
     // Initialize with sample cases
     const sampleCases: Case[] = [
@@ -41,6 +53,8 @@ export class MemStorage implements IStorage {
         query: "¿Qué estudios diagnósticos recomendarían para descartar patología biliar? ¿Es necesario manejo ambulatorio u hospitalización?",
         urgency: "Media",
         status: "Nuevo",
+        expertoAsignado: null,
+        creadoPor: "Dr. García",
         createdAt: new Date("2024-11-15")
       },
       {
@@ -52,6 +66,8 @@ export class MemStorage implements IStorage {
         query: "¿Qué protocolo de estudio recomiendan para cefalea crónica en paciente joven?",
         urgency: "Baja",
         status: "En revisión",
+        expertoAsignado: "Dr. María Rodríguez",
+        creadoPor: "Dr. García",
         createdAt: new Date("2024-11-14")
       },
       {
@@ -63,14 +79,29 @@ export class MemStorage implements IStorage {
         query: "¿Qué estudios cardiológicos básicos recomiendan para screening en paciente hipertenso?",
         urgency: "Baja",
         status: "Resuelto",
+        expertoAsignado: "Dr. María Rodríguez",
+        creadoPor: "Dr. García",
         createdAt: new Date("2024-11-12")
+      },
+      {
+        id: 4,
+        title: "Caso cancelado por duplicado",
+        sex: "F",
+        ageRange: "19-35",
+        description: "Caso duplicado, se cancela para evitar confusión.",
+        query: "Consulta duplicada",
+        urgency: "Baja",
+        status: "Cancelado",
+        expertoAsignado: null,
+        creadoPor: "Dr. García",
+        createdAt: new Date("2024-11-13")
       }
     ];
 
     sampleCases.forEach(case_ => {
       this.cases.set(case_.id, case_);
     });
-    this.currentCaseId = 4;
+    this.currentCaseId = 5;
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -100,7 +131,7 @@ export class MemStorage implements IStorage {
     return this.cases.get(id);
   }
 
-  async createCase(insertCase: InsertCase): Promise<Case> {
+  async createCase(insertCase: InsertCase, creadoPor: string): Promise<Case> {
     const id = this.currentCaseId++;
     const case_: Case = { 
       id, 
@@ -111,6 +142,8 @@ export class MemStorage implements IStorage {
       query: insertCase.query,
       urgency: insertCase.urgency,
       status: "Nuevo",
+      expertoAsignado: null,
+      creadoPor,
       createdAt: new Date()
     };
     this.cases.set(id, case_);
