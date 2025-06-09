@@ -49,6 +49,7 @@ export async function initializeDatabase() {
     // Create realistic immunodeficiency cases
     const casesData = [
       {
+        hashId: AuthUtils.generateCaseHashId(),
         title: "Infecciones respiratorias recurrentes",
         sex: "M",
         ageRange: "19-35",
@@ -65,6 +66,7 @@ export async function initializeDatabase() {
         mensajesNoLeidos: {}
       },
       {
+        hashId: AuthUtils.generateCaseHashId(),
         title: "Sospecha de inmunodeficiencia combinada",
         sex: "F", 
         ageRange: "0-5",
@@ -87,6 +89,7 @@ export async function initializeDatabase() {
         }
       },
       {
+        hashId: AuthUtils.generateCaseHashId(),
         title: "Déficit de complemento sospechado",
         sex: "M",
         ageRange: "6-18", 
@@ -107,6 +110,7 @@ export async function initializeDatabase() {
         mensajesNoLeidos: {}
       },
       {
+        hashId: AuthUtils.generateCaseHashId(),
         title: "Hipogammaglobulinemia y autoimmunidad",
         sex: "F",
         ageRange: "36-50",

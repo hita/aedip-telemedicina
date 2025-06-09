@@ -29,6 +29,18 @@ export class AuthUtils {
   }
 
   /**
+   * Generate unique case hash ID (4 characters: letters and numbers)
+   */
+  static generateCaseHashId(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 4; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  /**
    * Generate hashed passwords for default users
    */
   static async generateDefaultPasswords(): Promise<{ medico: string; experto: string; medico2: string }> {

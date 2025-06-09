@@ -13,6 +13,7 @@ export const users = pgTable("users", {
 
 export const cases = pgTable("cases", {
   id: serial("id").primaryKey(),
+  hashId: text("hash_id").notNull().unique(),
   title: text("title").notNull(),
   sex: text("sex").notNull(),
   ageRange: text("age_range").notNull(),
