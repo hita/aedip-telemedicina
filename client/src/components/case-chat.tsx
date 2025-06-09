@@ -94,6 +94,22 @@ export function CaseChat({ caseId, userRole, userName }: CaseChatProps) {
     return rol === "medico" ? "Médico" : "Experto";
   };
 
+  const getAnonymizedAuthorName = (autorNombre: string, autorRol: string, currentUserName: string) => {
+    // Show real name only to the author themselves
+    if (autorNombre === currentUserName) {
+      return autorNombre;
+    }
+    // For experts viewing doctor messages, show "Anónimo"
+    if (userRole === "experto" && autorRol === "medico") {
+      return "Anónimo";
+    }
+    // For doctors viewing expert messages, show the expert's name
+    if (userRole === "medico" && autorRol === "experto") {
+      return autorNombre;
+    }
+    return autorNombre;
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -140,7 +156,7 @@ export function CaseChat({ caseId, userRole, userName }: CaseChatProps) {
               {/* Show other person's name above their messages */}
               {message.autorNombre !== userName && (
                 <div className="text-xs text-gray-600 mb-1 px-1">
-                  {message.autorNombre} ({getRoleDisplayName(message.autorRol)})
+                  {getAnonymizedAuthorName(message.autorNombre, message.autorRol, userName)} ({getRoleDisplayName(message.autorRol)})
                 </div>
               )}
               <div

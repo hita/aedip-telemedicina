@@ -86,8 +86,10 @@ export default function NewCase() {
     },
   });
 
-  const onSubmit = (data: CreateCaseData) => {
-    createCaseMutation.mutate(data);
+  const onSubmit = (data: CreateCaseFormData) => {
+    // Remove dataAnonymized field before sending to API
+    const { dataAnonymized, ...caseData } = data;
+    createCaseMutation.mutate(caseData);
   };
 
   const handleCancel = () => {

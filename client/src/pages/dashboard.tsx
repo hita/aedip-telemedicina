@@ -202,7 +202,9 @@ export default function Dashboard() {
                 {/* Metadata row */}
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-4 text-gray-600">
-                    <span>Por {case_.creadoPor}</span>
+                    <span>
+                      Por {user?.user?.rol === "experto" ? "Médico Anónimo" : case_.creadoPor}
+                    </span>
                     {case_.expertoAsignado && (
                       <>
                         <span className="text-gray-400">•</span>

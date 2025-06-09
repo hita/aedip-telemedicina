@@ -43,7 +43,6 @@ export interface CreateCaseData {
   description?: string;
   query: string;
   urgency: string;
-  dataAnonymized: boolean;
 }
 
 export const SEX_OPTIONS = [

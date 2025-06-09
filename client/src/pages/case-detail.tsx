@@ -151,7 +151,9 @@ export default function CaseDetail() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-secondary">Creado por</p>
-                <p className="font-medium">{case_.creadoPor}</p>
+                <p className="font-medium">
+                  {user?.user?.rol === "experto" ? "Médico Anónimo" : case_.creadoPor}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-secondary">Fecha de Creación</p>
@@ -161,12 +163,12 @@ export default function CaseDetail() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-secondary">Creado por</p>
-                <p className="font-medium">{case_.creadoPor}</p>
-              </div>
-              <div>
                 <p className="text-sm text-secondary">Experto Asignado</p>
                 <p className="font-medium">{case_.expertoAsignado || "Sin asignar"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-secondary">Última Actualización</p>
+                <p className="font-medium">{formatDate(case_.updatedAt)}</p>
               </div>
             </div>
 
