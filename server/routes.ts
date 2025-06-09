@@ -158,6 +158,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update case status
+  app.patch("/api/cases/:id/status", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user) {
+        return res.status(401).json({ message: "Usuario no encontrado" });
+      }
+
+      const caseId = parseInt(req.params.id);
+      const { newStatus, razon } = req.body;
+      
+      if (!newStatus || !razon) {
+        return res.status(400).json({ message: "Estado y razón son requeridos" });
+      }
+
+      const updatedCase = await storage.updateCaseStatus(caseId, newStatus, razon);
+      
+      if (!updatedCase) {
+        return res.status(404).json({ message: "Caso no encontrado" });
+      }
+
+      res.json(updatedCase);
+    } catch (error) {
+      res.status(500).json({ message: "Error al actualizar estado del caso" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

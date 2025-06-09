@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, UserPlus, UserMinus, AlertCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
+import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { Case, STATUS_COLORS } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -141,13 +142,7 @@ export default function Dashboard() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium text-primary">{case_.title}</h3>
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      STATUS_COLORS[case_.status as keyof typeof STATUS_COLORS]
-                    }`}
-                  >
-                    {case_.status}
-                  </span>
+                  <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
                 </div>
                 <div className="text-sm text-secondary mb-3 space-y-1">
                   <p>Creado por: {case_.creadoPor}</p>
