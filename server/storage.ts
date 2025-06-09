@@ -68,6 +68,7 @@ export class MemStorage implements IStorage {
     const sampleCases: Case[] = [
       {
         id: 1,
+        hashId: "fMDp",
         title: "Dolor abdominal persistente",
         sex: "M",
         ageRange: "36-50",
@@ -87,6 +88,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: 2,
+        hashId: "q4da",
         title: "Cefalea recurrente",
         sex: "F",
         ageRange: "19-35",
@@ -106,6 +108,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: 3,
+        hashId: "yamz",
         title: "Evaluación cardiológica",
         sex: "M",
         ageRange: "51-65",
@@ -125,6 +128,7 @@ export class MemStorage implements IStorage {
       },
       {
         id: 4,
+        hashId: "Uvae",
         title: "Caso cancelado por duplicado",
         sex: "F",
         ageRange: "19-35",
@@ -453,10 +457,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCase(insertCase: InsertCase, creadoPor: string): Promise<Case> {
+    const hashId = AuthUtils.generateCaseHashId();
     const [case_] = await db
       .insert(cases)
       .values({
-        ...insertCase,
+        title: insertCase.title,
+        sex: insertCase.sex,
+        ageRange: insertCase.ageRange,
+        description: insertCase.description,
+        query: insertCase.query,
+        urgency: insertCase.urgency,
+        hashId,
         creadoPor,
         expertoAsignado: null,
         status: "Nuevo"

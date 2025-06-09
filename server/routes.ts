@@ -125,13 +125,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(case_);
     } catch (error) {
+      console.error("Error al crear caso:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
           message: "Datos inválidos", 
           errors: error.errors 
         });
       }
-      res.status(500).json({ message: "Error al crear caso" });
+      res.status(500).json({ message: "Error al crear caso", error: (error as Error).message });
     }
   });
 
