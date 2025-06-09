@@ -36,17 +36,13 @@ export function UserBadge({ user }: UserBadgeProps) {
   };
 
   return (
-    <div className="flex items-center justify-between w-full">
-      <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 bg-medical-blue rounded-full flex items-center justify-center">
-          <Stethoscope className="w-4 h-4 text-white" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-sm font-medium text-white">{user.nombre}</span>
-          <Badge variant="secondary" className="text-xs w-fit">
-            {getUserType()}
-          </Badge>
-        </div>
+    <div className="flex items-center space-x-3">
+      <div className="text-right">
+        <div className="text-sm font-medium text-gray-900">{user.nombre}</div>
+        <div className="text-xs text-gray-500">{getUserType()}</div>
+      </div>
+      <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center">
+        <Stethoscope className="w-4 h-4 text-white" />
       </div>
       
       <Popover>
@@ -54,7 +50,7 @@ export function UserBadge({ user }: UserBadgeProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-blue-700 p-2"
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1.5 rounded-lg"
           >
             <User className="w-4 h-4" />
           </Button>

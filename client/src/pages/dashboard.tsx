@@ -96,22 +96,19 @@ export default function Dashboard() {
   return (
     <>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-4">
+      <div className="bg-white border-b border-gray-200 px-6 py-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
             <img 
               src={aedipLogo} 
               alt="AEDIP" 
-              className="h-12 w-auto filter brightness-0 invert"
+              className="h-8 w-auto"
+              style={{filter: 'brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)'}}
             />
-            <div>
-              <h1 className="text-xl font-semibold">
-                {user?.user?.rol === "experto" ? "Panel de Experto" : "Panel de Casos"}
-              </h1>
-              <p className="text-blue-100 text-sm">
-                Sistema de consultas en inmunodeficiencias primarias
-              </p>
-            </div>
+            <div className="h-6 w-px bg-gray-300"></div>
+            <h1 className="text-2xl font-light text-gray-900 tracking-tight">
+              {user?.user?.rol === "experto" ? "Expert Panel" : "Cases"}
+            </h1>
           </div>
           {user?.user && <UserBadge user={user.user} />}
         </div>
