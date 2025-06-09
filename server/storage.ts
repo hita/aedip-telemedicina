@@ -278,21 +278,35 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCases(): Promise<Case[]> {
-    // Sort by status (Nuevo first) then by date descending
     const allCases = await db.select().from(cases);
     return allCases.sort((a, b) => {
-      if (a.status === "Nuevo" && b.status !== "Nuevo") return -1;
-      if (a.status !== "Nuevo" && b.status === "Nuevo") return 1;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      // Priority order: Nuevo > En revisión > Resuelto/Cancelado
+      const statusPriority = { "Nuevo": 3, "En revisión": 2, "Resuelto": 1, "Cancelado": 1 };
+      const aPriority = statusPriority[a.status as keyof typeof statusPriority] || 0;
+      const bPriority = statusPriority[b.status as keyof typeof statusPriority] || 0;
+      
+      if (aPriority !== bPriority) {
+        return bPriority - aPriority;
+      }
+      
+      // Within same priority, sort by updatedAt (most recent first)
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }
 
   async getCasesByCreator(creatorName: string): Promise<Case[]> {
     const userCases = await db.select().from(cases).where(eq(cases.creadoPor, creatorName));
     return userCases.sort((a, b) => {
-      if (a.status === "Nuevo" && b.status !== "Nuevo") return -1;
-      if (a.status !== "Nuevo" && b.status === "Nuevo") return 1;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      // Same priority logic as getCases
+      const statusPriority = { "Nuevo": 3, "En revisión": 2, "Resuelto": 1, "Cancelado": 1 };
+      const aPriority = statusPriority[a.status as keyof typeof statusPriority] || 0;
+      const bPriority = statusPriority[b.status as keyof typeof statusPriority] || 0;
+      
+      if (aPriority !== bPriority) {
+        return bPriority - aPriority;
+      }
+      
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }
 
@@ -320,7 +334,8 @@ export class DatabaseStorage implements IStorage {
       .set({ 
         expertoAsignado: expertName,
         status: expertName ? "En revisión" : "Nuevo",
-        razonCambio: expertName ? "Experto asignado automáticamente" : null
+        razonCambio: expertName ? "Experto asignado automáticamente" : null,
+        updatedAt: new Date()
       })
       .where(eq(cases.id, caseId))
       .returning();
@@ -333,7 +348,8 @@ export class DatabaseStorage implements IStorage {
       .set({ 
         status: newStatus,
         razonCambio: razon || null,
-        reabierto: newStatus === "En revisión" ? true : undefined
+        reabierto: newStatus === "En revisión" ? true : undefined,
+        updatedAt: new Date()
       })
       .where(eq(cases.id, caseId))
       .returning();

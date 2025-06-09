@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Plus, UserPlus, UserMinus, AlertCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
+import { CaseFilterBar } from "@/components/case-filter-bar";
 import { Case, STATUS_COLORS } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Dashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [filteredCases, setFilteredCases] = useState<Case[]>([]);
 
   // Check authentication
   const { data: user, isLoading: userLoading } = useQuery<{user: {id: number, email: string, rol: string, nombre: string}}>({
@@ -26,6 +28,13 @@ export default function Dashboard() {
     queryKey: ["/api/cases"],
     enabled: !!user,
   });
+
+  // Initialize filtered cases when data loads
+  useEffect(() => {
+    if (cases.length > 0 && filteredCases.length === 0) {
+      setFilteredCases(cases);
+    }
+  }, [cases, filteredCases.length]);
 
   // Assignment mutation for experts
   const assignMutation = useMutation({
@@ -99,7 +108,7 @@ export default function Dashboard() {
           </h2>
           <div className="flex items-center gap-3">
             <span className="text-sm text-secondary">
-              {cases.length} casos
+              {filteredCases.length} casos
             </span>
             {user?.user?.rol !== "experto" && (
               <Button
@@ -113,6 +122,13 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+
+        {/* Filter Bar */}
+        <CaseFilterBar 
+          cases={cases}
+          userRole={user?.user?.rol || ""}
+          onFiltersChange={setFilteredCases}
+        />
 
         {cases.length === 0 ? (
           <div className="text-center py-12">
