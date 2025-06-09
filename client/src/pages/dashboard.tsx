@@ -159,79 +159,99 @@ export default function Dashboard() {
             )}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filteredCases.map((case_) => (
               <div
                 key={case_.id}
                 onClick={() => viewCaseDetail(case_.id)}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md hover:border-medical-blue/30 transition-all duration-200"
+                className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm cursor-pointer hover:shadow-lg hover:border-medical-blue/40 transition-all duration-300 group"
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-primary">{case_.title}</h3>
-                    <UrgencyIndicator urgency={case_.urgency} />
-                    <UnreadMessagesBadge case_={case_} userEmail={user?.user?.email || ""} />
+                {/* Header with title and status */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-lg text-gray-900 truncate group-hover:text-medical-blue transition-colors">
+                        {case_.title}
+                      </h3>
+                      <UnreadMessagesBadge case_={case_} userEmail={user?.user?.email || ""} />
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <UrgencyIndicator urgency={case_.urgency} />
+                      <span className="text-sm text-gray-500">•</span>
+                      <span className="text-sm text-gray-500">{formatDate(case_.createdAt)}</span>
+                    </div>
                   </div>
-                  <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
-                </div>
-                <div className="text-sm text-secondary mb-3 space-y-1">
-                  <p>Creado por: {case_.creadoPor}</p>
-                  <p>Fecha: {formatDate(case_.createdAt)}</p>
-                  {case_.expertoAsignado && (
-                    <p>Experto: {case_.expertoAsignado}</p>
-                  )}
+                  <div className="ml-4 flex-shrink-0">
+                    <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
+                  </div>
                 </div>
 
-                {/* Alert for experts when case is unassigned and needs attention */}
-                {user?.user?.rol === "experto" && !case_.expertoAsignado && case_.status === "Nuevo" && (
-                  <Alert className="mb-3 border-orange-200 bg-orange-50">
-                    <AlertCircle className="h-4 w-4 text-orange-600" />
-                    <AlertDescription className="text-orange-800">
-                      Este caso necesita ser atendido por un experto
-                    </AlertDescription>
-                  </Alert>
-                )}
+                {/* Metadata row */}
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-4 text-gray-600">
+                    <span>Por {case_.creadoPor}</span>
+                    {case_.expertoAsignado && (
+                      <>
+                        <span className="text-gray-400">•</span>
+                        <span>Experto: {case_.expertoAsignado}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
 
-                {/* Assignment buttons for experts */}
+                {/* Expert actions and alerts */}
                 {user?.user?.rol === "experto" && (
-                  <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-                    <TooltipProvider>
-                      {!case_.expertoAsignado ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              onClick={() => assignMutation.mutate({ caseId: case_.id, action: "assign" })}
-                              variant="outline"
-                              size="sm"
-                              disabled={assignMutation.isPending}
-                              className="h-8 w-8 p-0"
-                            >
-                              <UserPlus className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Asignármelo a mis casos</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : case_.expertoAsignado === user?.user?.nombre ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              onClick={() => assignMutation.mutate({ caseId: case_.id, action: "unassign" })}
-                              variant="outline"
-                              size="sm"
-                              disabled={assignMutation.isPending}
-                              className="h-8 w-8 p-0"
-                            >
-                              <UserMinus className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Desasignarme de este caso</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      ) : null}
-                    </TooltipProvider>
+                  <div className="mt-4 flex items-center justify-between">
+                    {/* Alert for unassigned cases */}
+                    {!case_.expertoAsignado && case_.status === "Nuevo" && (
+                      <div className="flex items-center gap-2 text-orange-600 text-sm">
+                        <AlertCircle className="h-4 w-4" />
+                        <span>Necesita atención de experto</span>
+                      </div>
+                    )}
+                    
+                    {/* Assignment button */}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <TooltipProvider>
+                        {!case_.expertoAsignado ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                onClick={() => assignMutation.mutate({ caseId: case_.id, action: "assign" })}
+                                variant="outline"
+                                size="sm"
+                                disabled={assignMutation.isPending}
+                                className="h-8 px-3 text-xs font-medium"
+                              >
+                                <UserPlus className="h-3 w-3 mr-1" />
+                                Asignar
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Asignármelo a mis casos</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : case_.expertoAsignado === user?.user?.nombre ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                onClick={() => assignMutation.mutate({ caseId: case_.id, action: "unassign" })}
+                                variant="outline"
+                                size="sm"
+                                disabled={assignMutation.isPending}
+                                className="h-8 px-3 text-xs font-medium text-red-600 border-red-200 hover:bg-red-50"
+                              >
+                                <UserMinus className="h-3 w-3 mr-1" />
+                                Desasignar
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Desasignarme de este caso</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : null}
+                      </TooltipProvider>
+                    </div>
                   </div>
                 )}
               </div>
