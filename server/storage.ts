@@ -59,6 +59,9 @@ export class MemStorage implements IStorage {
         status: "Nuevo",
         expertoAsignado: null,
         creadoPor: "Dr. García",
+        razonCambio: null,
+        reabierto: false,
+        historialEstados: [],
         createdAt: new Date("2024-11-15")
       },
       {
@@ -72,6 +75,9 @@ export class MemStorage implements IStorage {
         status: "En revisión",
         expertoAsignado: "Dr. María Rodríguez",
         creadoPor: "Dr. García",
+        razonCambio: null,
+        reabierto: false,
+        historialEstados: [],
         createdAt: new Date("2024-11-14")
       },
       {
@@ -85,6 +91,9 @@ export class MemStorage implements IStorage {
         status: "Resuelto",
         expertoAsignado: "Dr. María Rodríguez",
         creadoPor: "Dr. García",
+        razonCambio: "Diagnóstico confirmado y recomendaciones dadas",
+        reabierto: false,
+        historialEstados: [],
         createdAt: new Date("2024-11-12")
       },
       {
@@ -98,6 +107,9 @@ export class MemStorage implements IStorage {
         status: "Cancelado",
         expertoAsignado: null,
         creadoPor: "Dr. García",
+        razonCambio: "Caso duplicado",
+        reabierto: false,
+        historialEstados: [],
         createdAt: new Date("2024-11-13")
       }
     ];

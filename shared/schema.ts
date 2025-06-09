@@ -1,9 +1,9 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
-  id: text("id").primaryKey(),
+  id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   rol: text("rol").notNull().default("medico"),
@@ -21,6 +21,9 @@ export const cases = pgTable("cases", {
   status: text("status").notNull().default("Nuevo"),
   expertoAsignado: text("experto_asignado"),
   creadoPor: text("creado_por").notNull(),
+  razonCambio: text("razon_cambio"),
+  reabierto: boolean("reabierto").default(false),
+  historialEstados: jsonb("historial_estados").default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
