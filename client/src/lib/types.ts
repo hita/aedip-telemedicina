@@ -112,3 +112,38 @@ export const STATUS_TRANSITIONS = {
     "Cancelado": ["En revisión"]
   }
 };
+
+// Ordering functions
+export const getStatusPriority = (status: string): number => {
+  switch (status) {
+    case "Nuevo": return 1;
+    case "En revisión": return 2;
+    case "Resuelto": return 3;
+    case "Cancelado": return 3;
+    default: return 4;
+  }
+};
+
+export const getUrgencyPriority = (urgency: string): number => {
+  switch (urgency) {
+    case "Alta": return 1;
+    case "Media": return 2;
+    case "Baja": return 3;
+    default: return 4;
+  }
+};
+
+export const sortCases = (cases: Case[]): Case[] => {
+  return [...cases].sort((a, b) => {
+    // First: Status priority (Nuevo > En revisión > Resuelto/Cancelado)
+    const statusDiff = getStatusPriority(a.status) - getStatusPriority(b.status);
+    if (statusDiff !== 0) return statusDiff;
+    
+    // Second: Urgency priority (Alta > Media > Baja)
+    const urgencyDiff = getUrgencyPriority(a.urgency) - getUrgencyPriority(b.urgency);
+    if (urgencyDiff !== 0) return urgencyDiff;
+    
+    // Third: Most recently updated first
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
+};

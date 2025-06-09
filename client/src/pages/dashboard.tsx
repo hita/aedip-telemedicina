@@ -8,7 +8,8 @@ import { Plus, UserPlus, UserMinus, AlertCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { CaseFilterBar } from "@/components/case-filter-bar";
-import { Case, STATUS_COLORS } from "@/lib/types";
+import { UrgencyIndicator } from "@/components/urgency-indicator";
+import { Case, STATUS_COLORS, sortCases } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,10 +32,10 @@ export default function Dashboard() {
 
   // Initialize filtered cases when data loads
   useEffect(() => {
-    if (cases.length > 0 && filteredCases.length === 0) {
-      setFilteredCases(cases);
+    if (cases.length > 0) {
+      setFilteredCases(sortCases(cases));
     }
-  }, [cases, filteredCases.length]);
+  }, [cases]);
 
   // Assignment mutation for experts
   const assignMutation = useMutation({
@@ -162,7 +163,10 @@ export default function Dashboard() {
                 className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-primary">{case_.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium text-primary">{case_.title}</h3>
+                    <UrgencyIndicator urgency={case_.urgency} />
+                  </div>
                   <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
                 </div>
                 <div className="text-sm text-secondary mb-3 space-y-1">

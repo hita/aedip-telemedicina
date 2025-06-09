@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Filter, AlertCircle } from "lucide-react";
-import { Case } from "@/lib/types";
+import { Case, sortCases } from "@/lib/types";
 
 interface CaseFilterBarProps {
   cases: Case[];
@@ -40,18 +40,18 @@ export function CaseFilterBar({ cases, userRole, onFiltersChange }: CaseFilterBa
     
     setVisibleStatuses(newVisibleStatuses);
     
-    // Filter cases based on visible statuses
+    // Filter cases based on visible statuses and apply sorting
     const filteredCases = cases.filter(case_ => 
       newVisibleStatuses.includes(case_.status)
     );
     
-    onFiltersChange(filteredCases);
+    onFiltersChange(sortCases(filteredCases));
   };
 
   const resetFilters = () => {
     const allStatuses = ["Nuevo", "En revisión", "Resuelto", "Cancelado"];
     setVisibleStatuses(allStatuses);
-    onFiltersChange(cases);
+    onFiltersChange(sortCases(cases));
   };
 
   return (
