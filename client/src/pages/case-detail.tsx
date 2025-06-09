@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
+import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { Case, STATUS_COLORS, SEX_OPTIONS, AGE_RANGE_OPTIONS } from "@/lib/types";
 
 export default function CaseDetail() {
@@ -102,13 +103,7 @@ export default function CaseDetail() {
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">{case_.title}</h2>
-            <span
-              className={`px-3 py-1 text-sm font-medium rounded-full ${
-                STATUS_COLORS[case_.status as keyof typeof STATUS_COLORS]
-              }`}
-            >
-              {case_.status}
-            </span>
+            <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
           </div>
 
           <div className="space-y-4">
