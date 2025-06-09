@@ -47,7 +47,8 @@ export class MemStorage implements IStorage {
       email: "doctor@hospital.com",
       password: medicoPasswordHash,
       rol: "medico",
-      nombre: "Dr. García"
+      nombre: "Dr. García",
+      nicknameAnonimo: AuthUtils.generateAnonymousNickname("Dr. García", "doctor@hospital.com")
     };
     
     const experto: User = {
@@ -55,7 +56,8 @@ export class MemStorage implements IStorage {
       email: "experto@hospital.com",
       password: expertoPasswordHash,
       rol: "experto",
-      nombre: "Dr. María Rodríguez"
+      nombre: "Dr. María Rodríguez",
+      nicknameAnonimo: null
     };
     
     this.users.set(1, medico);

@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 const SALT_ROUNDS = 12;
 
@@ -18,17 +19,29 @@ export class AuthUtils {
   }
 
   /**
+   * Generate anonymous nickname from user data
+   */
+  static generateAnonymousNickname(nombre: string, email: string): string {
+    const data = `${nombre}-${email}`;
+    const hash = crypto.createHash('sha256').update(data).digest('hex');
+    const shortHash = hash.substring(0, 8);
+    return `Anónimo ${shortHash}`;
+  }
+
+  /**
    * Generate hashed passwords for default users
    */
-  static async generateDefaultPasswords(): Promise<{ medico: string; experto: string }> {
-    const [medicoHash, expertoHash] = await Promise.all([
+  static async generateDefaultPasswords(): Promise<{ medico: string; experto: string; medico2: string }> {
+    const [medicoHash, expertoHash, medico2Hash] = await Promise.all([
+      this.hashPassword('1234'),
       this.hashPassword('1234'),
       this.hashPassword('1234')
     ]);
     
     return {
       medico: medicoHash,
-      experto: expertoHash
+      experto: expertoHash,
+      medico2: medico2Hash
     };
   }
 }
