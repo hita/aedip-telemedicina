@@ -24,8 +24,20 @@ export const cases = pgTable("cases", {
   razonCambio: text("razon_cambio"),
   reabierto: boolean("reabierto").default(false),
   historialEstados: jsonb("historial_estados").default([]),
+  ultimoMensaje: jsonb("ultimo_mensaje"),
+  mensajesNoLeidos: jsonb("mensajes_no_leidos").default({}),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  caseId: integer("case_id").notNull(),
+  autorNombre: text("autor_nombre").notNull(),
+  autorRol: text("autor_rol").notNull(),
+  contenido: text("contenido").notNull(),
+  fechaEnvio: timestamp("fecha_envio").defaultNow().notNull(),
+  leido: boolean("leido").default(false),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
@@ -39,7 +51,15 @@ export const insertCaseSchema = createInsertSchema(cases).omit({
   creadoPor: true,
 });
 
+export const insertMessageSchema = createInsertSchema(messages).omit({
+  id: true,
+  fechaEnvio: true,
+  leido: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertCase = z.infer<typeof insertCaseSchema>;
 export type Case = typeof cases.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;

@@ -1,4 +1,4 @@
-import { users, cases, type User, type InsertUser, type Case, type InsertCase } from "@shared/schema";
+import { users, cases, messages, type User, type InsertUser, type Case, type InsertCase, type Message, type InsertMessage } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -12,6 +12,9 @@ export interface IStorage {
   createCase(case_: InsertCase, creadoPor: string): Promise<Case>;
   assignExpertToCase(caseId: number, expertName: string | null): Promise<Case | undefined>;
   updateCaseStatus(caseId: number, newStatus: string, razon?: string): Promise<Case | undefined>;
+  getMessagesByCaseId(caseId: number): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessagesAsRead(caseId: number, userEmail: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -63,6 +66,8 @@ export class MemStorage implements IStorage {
         razonCambio: null,
         reabierto: false,
         historialEstados: [],
+        ultimoMensaje: null,
+        mensajesNoLeidos: {},
         createdAt: new Date("2024-11-15"),
         updatedAt: new Date("2024-11-15")
       },
@@ -80,6 +85,8 @@ export class MemStorage implements IStorage {
         razonCambio: null,
         reabierto: false,
         historialEstados: [],
+        ultimoMensaje: null,
+        mensajesNoLeidos: {},
         createdAt: new Date("2024-11-14"),
         updatedAt: new Date("2024-11-14")
       },
@@ -97,6 +104,8 @@ export class MemStorage implements IStorage {
         razonCambio: "Diagnóstico confirmado y recomendaciones dadas",
         reabierto: false,
         historialEstados: [],
+        ultimoMensaje: null,
+        mensajesNoLeidos: {},
         createdAt: new Date("2024-11-12"),
         updatedAt: new Date("2024-11-12")
       },
@@ -114,6 +123,8 @@ export class MemStorage implements IStorage {
         razonCambio: "Caso duplicado",
         reabierto: false,
         historialEstados: [],
+        ultimoMensaje: null,
+        mensajesNoLeidos: {},
         createdAt: new Date("2024-11-13"),
         updatedAt: new Date("2024-11-13")
       }
@@ -201,6 +212,8 @@ export class MemStorage implements IStorage {
       razonCambio: null,
       reabierto: false,
       historialEstados: [],
+      ultimoMensaje: null,
+      mensajesNoLeidos: {},
       createdAt: new Date(),
       updatedAt: new Date()
     };
