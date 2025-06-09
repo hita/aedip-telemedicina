@@ -20,14 +20,18 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private cases: Map<number, Case>;
+  private messages: Map<number, Message>;
   private currentUserId: number;
   private currentCaseId: number;
+  private currentMessageId: number;
 
   constructor() {
     this.users = new Map();
     this.cases = new Map();
+    this.messages = new Map();
     this.currentUserId = 1;
     this.currentCaseId = 1;
+    this.currentMessageId = 1;
 
     // Initialize with hardcoded users
     const medico: User = {
@@ -269,6 +273,79 @@ export class MemStorage implements IStorage {
     }
     return undefined;
   }
+
+  async getMessagesByCaseId(caseId: number): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(message => message.caseId === caseId)
+      .sort((a, b) => new Date(a.fechaEnvio).getTime() - new Date(b.fechaEnvio).getTime());
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const id = this.currentMessageId++;
+    const message: Message = {
+      id,
+      caseId: insertMessage.caseId,
+      autorNombre: insertMessage.autorNombre,
+      autorRol: insertMessage.autorRol,
+      contenido: insertMessage.contenido,
+      fechaEnvio: new Date(),
+      leido: false
+    };
+    
+    this.messages.set(id, message);
+    
+    // Update case with last message info and unread counts
+    const case_ = this.cases.get(insertMessage.caseId);
+    if (case_) {
+      const preview = insertMessage.contenido.length > 50 
+        ? insertMessage.contenido.substring(0, 50) + "..." 
+        : insertMessage.contenido;
+      
+      case_.ultimoMensaje = {
+        fecha: message.fechaEnvio.toISOString(),
+        autor: insertMessage.autorNombre,
+        preview
+      };
+      
+      // Initialize or update unread message counts
+      const currentCounts = (case_.mensajesNoLeidos as Record<string, number>) || {};
+      
+      // Get all users who should be notified (creator and assigned expert)
+      const usersToNotify = [];
+      if (case_.creadoPor !== insertMessage.autorNombre) {
+        // Find creator's email
+        const creator = Array.from(this.users.values()).find(u => u.nombre === case_.creadoPor);
+        if (creator) usersToNotify.push(creator.email);
+      }
+      if (case_.expertoAsignado && case_.expertoAsignado !== insertMessage.autorNombre) {
+        // Find expert's email
+        const expert = Array.from(this.users.values()).find(u => u.nombre === case_.expertoAsignado);
+        if (expert) usersToNotify.push(expert.email);
+      }
+      
+      // Increment unread count for notified users
+      usersToNotify.forEach(email => {
+        currentCounts[email] = (currentCounts[email] || 0) + 1;
+      });
+      
+      case_.mensajesNoLeidos = currentCounts;
+      
+      case_.updatedAt = new Date();
+      this.cases.set(insertMessage.caseId, case_);
+    }
+    
+    return message;
+  }
+
+  async markMessagesAsRead(caseId: number, userEmail: string): Promise<void> {
+    const case_ = this.cases.get(caseId);
+    if (case_) {
+      const currentCounts: Record<string, number> = (case_.mensajesNoLeidos as Record<string, number>) || {};
+      currentCounts[userEmail] = 0;
+      case_.mensajesNoLeidos = currentCounts;
+      this.cases.set(caseId, case_);
+    }
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -367,6 +444,78 @@ export class DatabaseStorage implements IStorage {
       .where(eq(cases.id, caseId))
       .returning();
     return updatedCase || undefined;
+  }
+
+  async getMessagesByCaseId(caseId: number): Promise<Message[]> {
+    return await db
+      .select()
+      .from(messages)
+      .where(eq(messages.caseId, caseId))
+      .orderBy(messages.fechaEnvio);
+  }
+
+  async createMessage(insertMessage: InsertMessage): Promise<Message> {
+    const [message] = await db
+      .insert(messages)
+      .values(insertMessage)
+      .returning();
+    
+    // Update case with last message info and unread counts
+    const [case_] = await db.select().from(cases).where(eq(cases.id, insertMessage.caseId));
+    if (case_) {
+      const preview = insertMessage.contenido.length > 50 
+        ? insertMessage.contenido.substring(0, 50) + "..." 
+        : insertMessage.contenido;
+      
+      const ultimoMensaje = {
+        fecha: message.fechaEnvio.toISOString(),
+        autor: insertMessage.autorNombre,
+        preview
+      };
+      
+      // Get current unread counts and increment for relevant users
+      const currentCounts = case_.mensajesNoLeidos as Record<string, number> || {};
+      
+      // Get users who should be notified
+      const usersToNotify = [];
+      if (case_.creadoPor !== insertMessage.autorNombre) {
+        const [creator] = await db.select().from(users).where(eq(users.nombre, case_.creadoPor));
+        if (creator) usersToNotify.push(creator.email);
+      }
+      if (case_.expertoAsignado && case_.expertoAsignado !== insertMessage.autorNombre) {
+        const [expert] = await db.select().from(users).where(eq(users.nombre, case_.expertoAsignado));
+        if (expert) usersToNotify.push(expert.email);
+      }
+      
+      // Update unread counts
+      usersToNotify.forEach(email => {
+        currentCounts[email] = (currentCounts[email] || 0) + 1;
+      });
+      
+      await db
+        .update(cases)
+        .set({ 
+          ultimoMensaje: ultimoMensaje,
+          mensajesNoLeidos: currentCounts,
+          updatedAt: new Date()
+        })
+        .where(eq(cases.id, insertMessage.caseId));
+    }
+    
+    return message;
+  }
+
+  async markMessagesAsRead(caseId: number, userEmail: string): Promise<void> {
+    const [case_] = await db.select().from(cases).where(eq(cases.id, caseId));
+    if (case_) {
+      const currentCounts = case_.mensajesNoLeidos as Record<string, number> || {};
+      currentCounts[userEmail] = 0;
+      
+      await db
+        .update(cases)
+        .set({ mensajesNoLeidos: currentCounts })
+        .where(eq(cases.id, caseId));
+    }
   }
 }
 
