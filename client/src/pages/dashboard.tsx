@@ -108,9 +108,13 @@ export default function Dashboard() {
                     {case_.status}
                   </span>
                 </div>
-                <p className="text-sm text-secondary mb-3">
-                  Creado: {formatDate(case_.createdAt)}
-                </p>
+                <div className="text-sm text-secondary mb-3 space-y-1">
+                  <p>Creado por: {case_.creadoPor}</p>
+                  <p>Fecha: {formatDate(case_.createdAt)}</p>
+                  {case_.expertoAsignado && (
+                    <p>Experto: {case_.expertoAsignado}</p>
+                  )}
+                </div>
                 <Button
                   onClick={() => viewCaseDetail(case_.id)}
                   variant="link"

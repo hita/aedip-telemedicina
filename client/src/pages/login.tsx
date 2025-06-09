@@ -109,6 +109,19 @@ export default function Login() {
             {loginMutation.isPending ? "Iniciando sesión..." : "Iniciar Sesión"}
           </Button>
         </form>
+
+        {/* Usuarios de prueba */}
+        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+          <p className="text-xs text-gray-600 mb-2 font-medium">Usuarios de prueba:</p>
+          <div className="space-y-2 text-xs">
+            <div>
+              <span className="font-medium">Médico:</span> doctor@hospital.com / 1234
+            </div>
+            <div>
+              <span className="font-medium">Experto:</span> experto@hospital.com / 1234
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

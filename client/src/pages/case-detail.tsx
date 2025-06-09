@@ -145,6 +145,17 @@ export default function CaseDetail() {
                 <p className="font-medium">{formatDate(case_.createdAt)}</p>
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-secondary">Creado por</p>
+                <p className="font-medium">{case_.creadoPor}</p>
+              </div>
+              <div>
+                <p className="text-sm text-secondary">Experto Asignado</p>
+                <p className="font-medium">{case_.expertoAsignado || "Sin asignar"}</p>
+              </div>
+            </div>
           </div>
         </div>
 
