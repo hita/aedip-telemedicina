@@ -130,16 +130,21 @@ export default function Dashboard() {
           onFiltersChange={setFilteredCases}
         />
 
-        {cases.length === 0 ? (
+        {filteredCases.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Plus className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium mb-2">No hay casos</h3>
+            <h3 className="text-lg font-medium mb-2">
+              {cases.length === 0 ? "No hay casos" : "No hay casos que coincidan con los filtros"}
+            </h3>
             <p className="text-secondary mb-6">
-              {user?.user?.rol === "experto" ? "No hay casos en el sistema" : "Crea tu primer caso médico para comenzar"}
+              {cases.length === 0 
+                ? (user?.user?.rol === "experto" ? "No hay casos en el sistema" : "Crea tu primer caso médico para comenzar")
+                : "Ajusta los filtros para ver más casos."
+              }
             </p>
-            {user?.user?.rol !== "experto" && (
+            {user?.user?.rol !== "experto" && cases.length === 0 && (
               <Button
                 onClick={() => setLocation("/nuevo-caso")}
                 className="bg-medical-blue hover:bg-blue-700 text-white"
@@ -151,7 +156,7 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {cases.map((case_) => (
+            {filteredCases.map((case_) => (
               <div
                 key={case_.id}
                 className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
