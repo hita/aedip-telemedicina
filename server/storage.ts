@@ -103,8 +103,13 @@ export class MemStorage implements IStorage {
   async createCase(insertCase: InsertCase): Promise<Case> {
     const id = this.currentCaseId++;
     const case_: Case = { 
-      ...insertCase, 
       id, 
+      title: insertCase.title,
+      sex: insertCase.sex,
+      ageRange: insertCase.ageRange,
+      description: insertCase.description || null,
+      query: insertCase.query,
+      urgency: insertCase.urgency,
       status: "Nuevo",
       createdAt: new Date()
     };

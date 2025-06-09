@@ -40,11 +40,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auth/me", async (req: any, res) => {
     try {
-      if (!req.session?.userId) {
+      if (!(req.session as any)?.userId) {
         return res.status(401).json({ message: "No autenticado" });
       }
 
-      const user = await storage.getUser(req.session.userId);
+      const user = await storage.getUser((req.session as any).userId);
       if (!user) {
         return res.status(401).json({ message: "Usuario no encontrado" });
       }
@@ -58,7 +58,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Cases
   app.get("/api/cases", async (req: any, res) => {
     try {
-      if (!req.session?.userId) {
+      if (!(req.session as any)?.userId) {
         return res.status(401).json({ message: "No autenticado" });
       }
 
@@ -71,7 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/cases/:id", async (req: any, res) => {
     try {
-      if (!req.session?.userId) {
+      if (!(req.session as any)?.userId) {
         return res.status(401).json({ message: "No autenticado" });
       }
 
@@ -93,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/cases", async (req: any, res) => {
     try {
-      if (!req.session?.userId) {
+      if (!(req.session as any)?.userId) {
         return res.status(401).json({ message: "No autenticado" });
       }
 
