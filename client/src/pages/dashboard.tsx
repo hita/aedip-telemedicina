@@ -167,6 +167,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-primary">{case_.title}</h3>
                     <UrgencyIndicator urgency={case_.urgency} />
+                    <UnreadMessagesBadge case_={case_} userEmail={user?.user?.email || ""} />
                   </div>
                   <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
                 </div>
