@@ -137,6 +137,12 @@ export function CaseChat({ caseId, userRole, userName }: CaseChatProps) {
                 message.autorNombre === userName ? "items-end" : "items-start"
               }`}
             >
+              {/* Show other person's name above their messages */}
+              {message.autorNombre !== userName && (
+                <div className="text-xs text-gray-600 mb-1 px-1">
+                  {message.autorNombre} ({getRoleDisplayName(message.autorRol)})
+                </div>
+              )}
               <div
                 className={`max-w-[80%] rounded-lg p-3 ${
                   message.autorNombre === userName
@@ -144,11 +150,6 @@ export function CaseChat({ caseId, userRole, userName }: CaseChatProps) {
                     : "bg-gray-100 text-gray-900"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-sm">
-                    {message.autorNombre} ({getRoleDisplayName(message.autorRol)})
-                  </span>
-                </div>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">
                   {message.contenido}
                 </p>

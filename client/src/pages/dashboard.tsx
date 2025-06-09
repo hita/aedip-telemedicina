@@ -25,10 +25,12 @@ export default function Dashboard() {
     retry: false,
   });
 
-  // Get cases
+  // Get cases with polling
   const { data: cases = [], isLoading: casesLoading } = useQuery<Case[]>({
     queryKey: ["/api/cases"],
     enabled: !!user,
+    refetchInterval: 10000, // Poll every 10 seconds
+    refetchIntervalInBackground: true,
   });
 
   // Initialize filtered cases when data loads
@@ -161,7 +163,8 @@ export default function Dashboard() {
             {filteredCases.map((case_) => (
               <div
                 key={case_.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                onClick={() => viewCaseDetail(case_.id)}
+                className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md hover:border-medical-blue/30 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
@@ -189,17 +192,9 @@ export default function Dashboard() {
                   </Alert>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <Button
-                    onClick={() => viewCaseDetail(case_.id)}
-                    variant="link"
-                    className="text-medical-blue p-0 h-auto font-medium hover:underline"
-                  >
-                    Ver Detalles
-                  </Button>
-
-                  {/* Assignment buttons for experts */}
-                  {user?.user?.rol === "experto" && (
+                {/* Assignment buttons for experts */}
+                {user?.user?.rol === "experto" && (
+                  <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                     <TooltipProvider>
                       {!case_.expertoAsignado ? (
                         <Tooltip>
@@ -237,8 +232,8 @@ export default function Dashboard() {
                         </Tooltip>
                       ) : null}
                     </TooltipProvider>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
