@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
+import { UrgencyIndicator } from "@/components/urgency-indicator";
 import { Case, STATUS_COLORS, SEX_OPTIONS, AGE_RANGE_OPTIONS } from "@/lib/types";
 
 export default function CaseDetail() {
@@ -102,7 +103,10 @@ export default function CaseDetail() {
       <div className="px-6 py-4 space-y-6">
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">{case_.title}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold">{case_.title}</h2>
+              <UrgencyIndicator urgency={case_.urgency} />
+            </div>
             <ClickableStatusBadge case_={case_} userRole={user?.user?.rol || ""} />
           </div>
 
@@ -132,8 +136,8 @@ export default function CaseDetail() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-secondary">Nivel de Urgencia</p>
-                <p className="font-medium">{case_.urgency}</p>
+                <p className="text-sm text-secondary">Creado por</p>
+                <p className="font-medium">{case_.creadoPor}</p>
               </div>
               <div>
                 <p className="text-sm text-secondary">Fecha de Creación</p>
