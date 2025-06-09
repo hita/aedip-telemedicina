@@ -7,6 +7,8 @@ export interface Case {
   query: string;
   urgency: string;
   status: string;
+  expertoAsignado?: string | null;
+  creadoPor: string;
   createdAt: string;
 }
 
@@ -43,4 +45,5 @@ export const STATUS_COLORS = {
   "Nuevo": "bg-blue-100 text-blue-700",
   "En revisión": "bg-yellow-100 text-yellow-700", 
   "Resuelto": "bg-green-100 text-green-700",
+  "Cancelado": "bg-red-100 text-red-700",
 };

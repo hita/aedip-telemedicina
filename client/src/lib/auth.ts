@@ -3,6 +3,8 @@ import { apiRequest } from "./queryClient";
 export interface User {
   id: number;
   email: string;
+  rol: string;
+  nombre: string;
 }
 
 export interface LoginCredentials {
