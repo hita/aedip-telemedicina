@@ -1,5 +1,6 @@
 import { db } from "./db";
-import { users, cases, messages } from "@shared/schema";
+import { users, cases, messages, centrosReferencia } from "@shared/schema";
+import { DEFAULT_CENTROS } from "@shared/centros-referencia";
 import { AuthUtils } from "./auth";
 import { eq } from "drizzle-orm";
 
@@ -12,6 +13,10 @@ export async function initializeDatabase() {
     await db.delete(messages);
     await db.delete(cases);
     await db.delete(users);
+    await db.delete(centrosReferencia);
+
+    // Insert centros de referencia
+    await db.insert(centrosReferencia).values(DEFAULT_CENTROS);
 
     // Generate secure password hashes for default users
     const { medico: medicoPasswordHash, experto: expertoPasswordHash, medico2: medico2PasswordHash } = 
@@ -52,6 +57,30 @@ export async function initializeDatabase() {
         nombre: "Coordinador Principal",
         nicknameAnonimo: null,
         centroReferencia: null
+      },
+      {
+        email: "experto2@hospital.com",
+        password: await AuthUtils.hashPassword("1234"),
+        rol: "experto",
+        nombre: "Dr. Ana Martín",
+        nicknameAnonimo: null,
+        centroReferencia: "Barcelona"
+      },
+      {
+        email: "experto3@hospital.com",
+        password: await AuthUtils.hashPassword("1234"),
+        rol: "experto",
+        nombre: "Dr. Carlos Vega",
+        nicknameAnonimo: null,
+        centroReferencia: "Sevilla"
+      },
+      {
+        email: "experto4@hospital.com",
+        password: await AuthUtils.hashPassword("1234"),
+        rol: "experto",
+        nombre: "Dra. Isabel Santos",
+        nicknameAnonimo: null,
+        centroReferencia: "Gregorio Marañón"
       }
     ]).returning();
 
@@ -234,6 +263,9 @@ export async function initializeDatabase() {
     console.log("- experto@hospital.com / 1234 (Centro: La Paz)");
     console.log("- doctor2@hospital.com / 1234 (nickname: " + medico2Nickname + ")");
     console.log("- coordinador@hospital.com / 1234");
+    console.log("- experto2@hospital.com / 1234 (Centro: Barcelona)");
+    console.log("- experto3@hospital.com / 1234 (Centro: Sevilla)");
+    console.log("- experto4@hospital.com / 1234 (Centro: Gregorio Marañón)");
     
   } catch (error) {
     console.error("Error initializing database:", error);

@@ -10,6 +10,7 @@ import NewCase from "@/pages/new-case";
 import CaseDetail from "@/pages/case-detail";
 import NotFound from "@/pages/not-found";
 import CoordinatorDashboard from "@/pages/coordinator-dashboard";
+import AccessDenied from "@/pages/access-denied";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/coordinador" component={CoordinatorDashboard} />
       <Route path="/nuevo-caso" component={NewCase} />
       <Route path="/caso/:id" component={CaseDetail} />
+      <Route path="/acceso-denegado" component={AccessDenied} />
       <Route component={NotFound} />
     </Switch>
   );

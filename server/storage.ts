@@ -23,6 +23,7 @@ export interface IStorage {
   deleteUser(id: number): Promise<boolean>;
   resetUserPassword(id: number, newPassword: string): Promise<boolean>;
   updateCase(caseId: number, updates: Partial<Case>): Promise<Case | undefined>;
+  getCentrosReferencia(): Promise<CentroReferencia[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -437,6 +438,16 @@ export class MemStorage implements IStorage {
     this.cases.set(caseId, updatedCase);
     return updatedCase;
   }
+
+  async getCentrosReferencia(): Promise<CentroReferencia[]> {
+    // For memory storage, return hardcoded centers
+    return [
+      { id: 1, nombre: "Sevilla", activo: "true" },
+      { id: 2, nombre: "Barcelona", activo: "true" },
+      { id: 3, nombre: "La Paz", activo: "true" },
+      { id: 4, nombre: "Gregorio Marañón", activo: "true" },
+    ];
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -671,6 +682,11 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return result[0];
+  }
+
+  async getCentrosReferencia(): Promise<CentroReferencia[]> {
+    const result = await db.select().from(centrosReferencia).where(eq(centrosReferencia.activo, "true"));
+    return result;
   }
 }
 

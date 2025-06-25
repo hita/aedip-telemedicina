@@ -424,6 +424,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/centros-referencia", async (req: any, res) => {
+    try {
+      const centros = await storage.getCentrosReferencia();
+      res.json(centros);
+    } catch (error) {
+      res.status(500).json({ message: "Error al obtener centros de referencia" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

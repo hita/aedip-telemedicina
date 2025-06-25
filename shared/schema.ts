@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, timestamp, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { centrosReferencia } from "./centros-referencia";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -67,3 +68,7 @@ export type InsertCase = z.infer<typeof insertCaseSchema>;
 export type Case = typeof cases.$inferSelect;
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+
+// Export centros de referencia
+export { centrosReferencia } from "./centros-referencia";
+export type { CentroReferencia } from "./centros-referencia";

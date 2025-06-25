@@ -11,14 +11,21 @@ import { UserBadge } from "@/components/user-badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, Edit, UserPlus, KeyRound, Search, Filter } from "lucide-react";
-import { Case, CENTROS_REFERENCIA } from "@/lib/types";
+import { Case } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
-// import aedipLogo from '@assets/aedip-logo.svg';
+import { RouteGuard } from "@/components/route-guard";
+import aedipLogo from '@assets/aedip-logo.svg';
 
 interface CoordinatorUser extends User {
   centroReferencia?: string | null;
+}
+
+interface CentroReferencia {
+  id: number;
+  nombre: string;
+  activo: string;
 }
 
 interface CreateUserData {
@@ -29,7 +36,7 @@ interface CreateUserData {
   centroReferencia?: string;
 }
 
-export default function CoordinatorDashboard() {
+function CoordinatorDashboardContent() {
   const [searchUser, setSearchUser] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [searchCase, setSearchCase] = useState("");
@@ -58,6 +65,11 @@ export default function CoordinatorDashboard() {
   // Fetch all cases
   const { data: cases = [], isLoading: casesLoading, refetch: refetchCases } = useQuery<Case[]>({
     queryKey: ["/api/cases"],
+  });
+
+  // Fetch centros de referencia
+  const { data: centros = [] } = useQuery<CentroReferencia[]>({
+    queryKey: ["/api/centros-referencia"],
   });
 
   // Create user mutation
@@ -217,9 +229,12 @@ export default function CoordinatorDashboard() {
       <div className="bg-white border-b border-gray-200 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <div className="h-8 w-12 bg-medical-blue rounded flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AEDIP</span>
-            </div>
+            <img 
+              src={aedipLogo} 
+              alt="AEDIP" 
+              className="h-8 w-auto"
+              style={{filter: 'brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)'}}
+            />
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-light text-gray-900 tracking-tight">
               Panel de Coordinador
@@ -229,7 +244,7 @@ export default function CoordinatorDashboard() {
         </div>
       </div>
 
-      <div className="container mx-auto p-6">
+      <div className="w-full px-6 py-4">
         <Tabs defaultValue="users" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="users">Gestión de Usuarios</TabsTrigger>
@@ -304,14 +319,17 @@ export default function CoordinatorDashboard() {
                         {newUserData.rol === "experto" && (
                           <div>
                             <Label htmlFor="centro">Centro de Referencia</Label>
-                            <Select value={newUserData.centroReferencia} onValueChange={(value) => setNewUserData({ ...newUserData, centroReferencia: value })}>
+                            <Select 
+                              value={newUserData.centroReferencia} 
+                              onValueChange={(value) => setNewUserData({ ...newUserData, centroReferencia: value })}
+                            >
                               <SelectTrigger>
                                 <SelectValue placeholder="Selecciona un centro" />
                               </SelectTrigger>
                               <SelectContent>
-                                {CENTROS_REFERENCIA.map(centro => (
-                                  <SelectItem key={centro.value} value={centro.value}>
-                                    {centro.label}
+                                {centros.map(centro => (
+                                  <SelectItem key={centro.id} value={centro.nombre}>
+                                    {centro.nombre}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -493,7 +511,12 @@ export default function CoordinatorDashboard() {
                           <div className="flex items-center gap-4 text-xs text-gray-500">
                             <span>Creado por: {case_.creadoPor}</span>
                             {case_.expertoAsignado && (
-                              <span>Experto: {case_.expertoAsignado}</span>
+                              <span>Experto: {case_.expertoAsignado}
+                                {(() => {
+                                  const expert = experts.find(e => e.nombre === case_.expertoAsignado);
+                                  return expert?.centroReferencia ? ` (${expert.centroReferencia})` : '';
+                                })()}
+                              </span>
                             )}
                             <span>Fecha: {new Date(case_.createdAt).toLocaleDateString()}</span>
                           </div>
@@ -555,7 +578,14 @@ export default function CoordinatorDashboard() {
               </div>
               <div>
                 <Label htmlFor="edit-rol">Rol</Label>
-                <Select value={editingUser.rol} onValueChange={(value) => setEditingUser({ ...editingUser, rol: value })}>
+                <Select value={editingUser.rol} onValueChange={(value) => {
+                  const updates = { ...editingUser, rol: value };
+                  // Clear centro de referencia if not experto
+                  if (value !== "experto") {
+                    updates.centroReferencia = null;
+                  }
+                  setEditingUser(updates);
+                }}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -574,9 +604,9 @@ export default function CoordinatorDashboard() {
                       <SelectValue placeholder="Selecciona un centro" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CENTROS_REFERENCIA.map(centro => (
-                        <SelectItem key={centro.value} value={centro.value}>
-                          {centro.label}
+                      {centros.map(centro => (
+                        <SelectItem key={centro.id} value={centro.nombre}>
+                          {centro.nombre}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -607,5 +637,13 @@ export default function CoordinatorDashboard() {
         </Dialog>
       )}
     </>
+  );
+}
+
+export default function CoordinatorDashboard() {
+  return (
+    <RouteGuard allowedRoles={["coordinador"]}>
+      <CoordinatorDashboardContent />
+    </RouteGuard>
   );
 }
