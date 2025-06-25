@@ -118,7 +118,7 @@ function DashboardContent() {
       {/* Cases List */}
       <div className="flex-1 px-6 py-4">
         <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-medium">
             {user?.user?.rol === "experto" ? "Todos los Casos del Sistema" : "Mis Casos"}
           </h2>

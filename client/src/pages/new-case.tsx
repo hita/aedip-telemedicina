@@ -129,7 +129,7 @@ function NewCaseContent() {
       <div className="flex-1 px-6 py-4">
         <div className="max-w-2xl mx-auto">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
+            <div>
             <Label htmlFor="title" className="text-secondary">
               Título del Caso *
             </Label>
