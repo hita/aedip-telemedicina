@@ -536,7 +536,7 @@ function CoordinatorDashboardContent() {
                               <SelectContent>
                                 {experts.map(expert => (
                                   <SelectItem key={expert.id} value={expert.nombre}>
-                                    {expert.nombre} {expert.centroReferencia && `(${expert.centroReferencia})`}
+                                    {expert.nombre}{expert.centroReferencia ? ` (${expert.centroReferencia})` : ''}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

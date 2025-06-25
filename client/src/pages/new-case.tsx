@@ -295,3 +295,11 @@ function NewCaseContent() {
     </>
   );
 }
+
+export default function NewCase() {
+  return (
+    <RouteGuard allowedRoles={["medico"]}>
+      <NewCaseContent />
+    </RouteGuard>
+  );
+}

@@ -8,6 +8,7 @@ import aedipLogo from "@/assets/aedip-logo-oficial.png";
 import { ClickableStatusBadge } from "@/components/clickable-status-badge";
 import { UrgencyIndicator } from "@/components/urgency-indicator";
 import { CaseChat } from "@/components/case-chat";
+import { RouteGuard } from "@/components/route-guard";
 import { Case, STATUS_COLORS, SEX_OPTIONS, AGE_RANGE_OPTIONS } from "@/lib/types";
 
 function CaseDetailContent() {
@@ -196,5 +197,13 @@ function CaseDetailContent() {
         />
       </div>
     </>
+  );
+}
+
+export default function CaseDetail() {
+  return (
+    <RouteGuard allowedRoles={["medico", "experto", "coordinador"]}>
+      <CaseDetailContent />
+    </RouteGuard>
   );
 }

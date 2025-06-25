@@ -32,16 +32,24 @@ This is a specialized medical consultation platform for healthcare professionals
 ## Key Components
 
 ### Authentication System
-- Role-based access control (médico/experto)
+- Role-based access control (médico/experto/coordinador)
 - Secure password hashing with bcrypt (12 rounds)
 - Anonymous nickname generation for privacy
 - Session-based authentication with server-side storage
+- Route guards preventing unauthorized access
 
 ### Case Management
 - Unique 4-character hash IDs for case identification
 - Status workflow management (Nuevo → En revisión → Resuelto/Cancelado)
 - Urgency levels (Alta/Media/Baja)
 - Expert assignment system for case routing
+- Centro de Referencia tracking for experts
+
+### Coordinator Dashboard
+- Complete user management (create, edit, delete, password reset)
+- Case oversight and manual expert assignment
+- Centro de Referencia management for expert specialization
+- Full-width viewport design for comprehensive data management
 
 ### Real-time Communication
 - Chat system for case discussions
@@ -99,10 +107,13 @@ This is a specialized medical consultation platform for healthcare professionals
   - Production: `npm run build && npm run start`
 - **Database Management**: `npm run db:push` for schema updates
 
-## Changelog
+## Recent Changes
 ```
-Changelog:
-- June 25, 2025. Initial setup
+- June 25, 2025: Initial setup completed
+- June 25, 2025: Added Coordinator role with independent dashboard
+- June 25, 2025: Implemented Centro de Referencia system for experts
+- June 25, 2025: Enhanced security with role-based access control
+- June 25, 2025: Added comprehensive user and case management for coordinators
 ```
 
 ## User Preferences
