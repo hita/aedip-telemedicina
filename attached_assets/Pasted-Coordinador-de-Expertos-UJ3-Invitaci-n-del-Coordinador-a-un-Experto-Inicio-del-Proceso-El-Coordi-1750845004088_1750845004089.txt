@@ -1,0 +1,29 @@
+Coordinador de Expertos (UJ3):
+Invitación del Coordinador a un Experto
+Inicio del Proceso: El Coordinador accede a la plataforma y se dirige a la vista de "Gestión de Expertos". Allí selecciona la opción "Añadir Experto", ingresando el correo electrónico del experto.
+Envío de Invitación: Tras ingresar el correo electrónico, el sistema envía automáticamente un correo al experto con un enlace de invitación para que este complete su perfil y cree una contraseña segura.
+Notificación: El Coordinador recibe una notificación confirmando que la invitación ha sido enviada correctamente al experto.
+Registro del Experto Invitado
+Correo de Invitación: El experto recibe un correo con un enlace de invitación, el cual contiene instrucciones para acceder al sistema.
+Confirmación de la Cuenta: El experto hace clic en el enlace, que lo redirige a la plataforma. Allí, debe confirmar su cuenta ingresando su nombre, correo y estableciendo una contraseña segura que cumpla los requisitos del sistema (mínimo 8 caracteres, mayúsculas, minúsculas, número y carácter especial).
+Completar Perfil: Una vez dentro, el experto debe completar todos los campos obligatorios en la vista de "Mi Perfil", incluyendo información personal (nombre, apellidos, DNI, especialidad médica, número de colegiado, etc.).
+Estado Pendiente de Verificación: El perfil del experto queda marcado como "Pendiente de Verificación" hasta que un Coordinador valide sus credenciales.
+Verificación del Experto por el Coordinador
+Acceso a la Verificación: El Coordinador recibe una notificación de que el experto ha completado su registro y ahora puede proceder a la validación.
+Validación de Credenciales: El Coordinador revisa los datos proporcionados por el experto (número de colegiado, licencia médica, certificaciones, etc.) y los verifica en las bases de datos del colegio profesional correspondiente.
+Marcado de Verificación: Una vez validados los datos, el Coordinador marca al experto como "Verificado" en el sistema.
+Log de Actividad: El sistema genera un registro auditable que detalla quién verificó al experto, cuándo, y con qué información.
+Notificación al Experto: El experto recibe una notificación informando que su cuenta ha sido verificada y ya puede empezar a trabajar en los casos asignados.
+Asignación de Casos al Experto
+Acceso a Casos Asignados: Una vez verificado, el experto podrá ver los casos que ya estén asignados a él en cualquier estado.
+Nuevas Asignaciones: El Coordinador puede asignar casos directamente al experto a través de la vista de "Todos los Expedientes", tanto casos nuevos como casos que ya estaban asignados a otros expertos. El experto será notificado de cada nueva asignación o reasignación de un caso.
+
+Flujo Completo del Coordinador
+Gestión de Expertos
+Añadir Expertos: El Coordinador puede añadir nuevos expertos ingresando solo su correo electrónico.
+Editar y Desactivar: Tiene la capacidad de editar los datos del experto o desactivarlo del sistema si ya no está disponible, respetando el historial del experto y manteniendo su información en el sistema para auditoría futura.
+Gestión de Casos
+Asignación y Reasignación: El Coordinador puede asignar o reasignar casos a cualquier experto, incluyéndose a sí mismo, en cualquier momento.
+Gestión de Estados y Campos: Puede cambiar el estado de los casos, responder en el chat y editar cualquier campo relevante, lo que asegura que los casos avanzan sin problemas.
+
+Informes Automáticos: Recibe un informe diario con los casos que llevan más de 24 horas sin atención, lo que le permite tomar acciones para redistribuir la carga de trabajo si es necesario.
