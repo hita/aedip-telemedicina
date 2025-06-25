@@ -10,8 +10,9 @@ export type CentroReferencia = typeof centrosReferencia.$inferSelect;
 
 // Default centers data
 export const DEFAULT_CENTROS = [
-  { nombre: "Sevilla" },
-  { nombre: "Barcelona" },
+  { nombre: "Sant Joan de Déu" },
+  { nombre: "Vall d'Hebron" },
   { nombre: "La Paz" },
   { nombre: "Gregorio Marañón" },
+  { nombre: "Virgen del Rocío" },
 ];

@@ -442,10 +442,11 @@ export class MemStorage implements IStorage {
   async getCentrosReferencia(): Promise<CentroReferencia[]> {
     // For memory storage, return hardcoded centers
     return [
-      { id: 1, nombre: "Sevilla", activo: "true" },
-      { id: 2, nombre: "Barcelona", activo: "true" },
+      { id: 1, nombre: "Sant Joan de Déu", activo: "true" },
+      { id: 2, nombre: "Vall d'Hebron", activo: "true" },
       { id: 3, nombre: "La Paz", activo: "true" },
       { id: 4, nombre: "Gregorio Marañón", activo: "true" },
+      { id: 5, nombre: "Virgen del Rocío", activo: "true" },
     ];
   }
 }

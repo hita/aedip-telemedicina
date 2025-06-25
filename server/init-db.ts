@@ -64,7 +64,7 @@ export async function initializeDatabase() {
         rol: "experto",
         nombre: "Dr. Ana Martín",
         nicknameAnonimo: null,
-        centroReferencia: "Barcelona"
+        centroReferencia: "Vall d'Hebron"
       },
       {
         email: "experto3@hospital.com",
@@ -72,7 +72,7 @@ export async function initializeDatabase() {
         rol: "experto",
         nombre: "Dr. Carlos Vega",
         nicknameAnonimo: null,
-        centroReferencia: "Sevilla"
+        centroReferencia: "Sant Joan de Déu"
       },
       {
         email: "experto4@hospital.com",
@@ -81,6 +81,14 @@ export async function initializeDatabase() {
         nombre: "Dra. Isabel Santos",
         nicknameAnonimo: null,
         centroReferencia: "Gregorio Marañón"
+      },
+      {
+        email: "experto5@hospital.com",
+        password: await AuthUtils.hashPassword("1234"),
+        rol: "experto",
+        nombre: "Dr. Miguel Torres",
+        nicknameAnonimo: null,
+        centroReferencia: "Virgen del Rocío"
       }
     ]).returning();
 
@@ -263,9 +271,10 @@ export async function initializeDatabase() {
     console.log("- experto@hospital.com / 1234 (Centro: La Paz)");
     console.log("- doctor2@hospital.com / 1234 (nickname: " + medico2Nickname + ")");
     console.log("- coordinador@hospital.com / 1234");
-    console.log("- experto2@hospital.com / 1234 (Centro: Barcelona)");
-    console.log("- experto3@hospital.com / 1234 (Centro: Sevilla)");
+    console.log("- experto2@hospital.com / 1234 (Centro: Vall d'Hebron)");
+    console.log("- experto3@hospital.com / 1234 (Centro: Sant Joan de Déu)");
     console.log("- experto4@hospital.com / 1234 (Centro: Gregorio Marañón)");
+    console.log("- experto5@hospital.com / 1234 (Centro: Virgen del Rocío)");
     
   } catch (error) {
     console.error("Error initializing database:", error);
