@@ -120,6 +120,7 @@ This is a specialized medical consultation platform for healthcare professionals
 - June 25, 2025: Confirmed working coordinator credentials: coordinador@hospital.com / 1234
 - June 25, 2025: Enhanced coordinator case management with clickable case cards and expert reassignment
 - June 25, 2025: Added notification bubble for pending cases and 8 additional test cases
+- June 25, 2025: Fixed case detail back navigation to route coordinators to /coordinador instead of /dashboard
 ```
 
 ## User Preferences
