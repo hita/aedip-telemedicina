@@ -440,20 +440,14 @@ export class MemStorage implements IStorage {
   }
 
   async getCentrosReferencia(): Promise<CentroReferencia[]> {
-    try {
-      const centros = await db.select().from(centrosReferencia).where(eq(centrosReferencia.activo, "true"));
-      return centros;
-    } catch (error) {
-      console.error("Error fetching centros referencia:", error);
-      // Return hardcoded list as fallback
-      return [
-        { id: 1, nombre: "Sant Joan de Déu", activo: "true" },
-        { id: 2, nombre: "Vall d'Hebron", activo: "true" },
-        { id: 3, nombre: "La Paz", activo: "true" },
-        { id: 4, nombre: "Gregorio Marañón", activo: "true" },
-        { id: 5, nombre: "Virgen del Rocío", activo: "true" },
-      ];
-    }
+    // Simple hardcoded approach - revert database complexity
+    return [
+      { id: 1, nombre: "Sant Joan de Déu", activo: "true" },
+      { id: 2, nombre: "Vall d'Hebron", activo: "true" },
+      { id: 3, nombre: "La Paz", activo: "true" },
+      { id: 4, nombre: "Gregorio Marañón", activo: "true" },
+      { id: 5, nombre: "Virgen del Rocío", activo: "true" },
+    ];
   }
 }
 

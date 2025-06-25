@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Override Tailwind's restrictive max-width for responsive design */
+.max-w-md {
+  max-width: 68rem !important;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);
