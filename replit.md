@@ -114,6 +114,10 @@ This is a specialized medical consultation platform for healthcare professionals
 - June 25, 2025: Implemented Centro de Referencia system for experts
 - June 25, 2025: Enhanced security with role-based access control
 - June 25, 2025: Added comprehensive user and case management for coordinators
+- June 25, 2025: Fixed coordinator login redirection to /coordinador
+- June 25, 2025: Resolved Centro de Referencia dropdown with hardcoded values
+- June 25, 2025: Applied viewport width fixes with CSS override (.max-w-md to 68rem)
+- June 25, 2025: Confirmed working coordinator credentials: coordinador@hospital.com / 1234
 ```
 
 ## User Preferences
