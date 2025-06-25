@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import NewCase from "@/pages/new-case";
 import CaseDetail from "@/pages/case-detail";
 import NotFound from "@/pages/not-found";
+import CoordinatorDashboard from "@/pages/coordinator-dashboard";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={Login} />
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/coordinador" component={CoordinatorDashboard} />
       <Route path="/nuevo-caso" component={NewCase} />
       <Route path="/caso/:id" component={CaseDetail} />
       <Route component={NotFound} />

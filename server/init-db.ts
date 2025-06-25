@@ -35,7 +35,8 @@ export async function initializeDatabase() {
         password: expertoPasswordHash,
         rol: "experto",
         nombre: "Dr. María Rodríguez",
-        nicknameAnonimo: null
+        nicknameAnonimo: null,
+        centroReferencia: "La Paz"
       },
       {
         email: "doctor2@hospital.com",
@@ -43,6 +44,14 @@ export async function initializeDatabase() {
         rol: "medico", 
         nombre: "Dr. López",
         nicknameAnonimo: medico2Nickname
+      },
+      {
+        email: "coordinador@hospital.com",
+        password: await AuthUtils.hashPassword("1234"),
+        rol: "coordinador",
+        nombre: "Coordinador Principal",
+        nicknameAnonimo: null,
+        centroReferencia: null
       }
     ]).returning();
 
@@ -222,8 +231,9 @@ export async function initializeDatabase() {
     console.log("Database initialized with secure users and immunodeficiency cases");
     console.log("Default credentials:");
     console.log("- doctor@hospital.com / 1234 (nickname: " + medicoNickname + ")");
-    console.log("- experto@hospital.com / 1234");
+    console.log("- experto@hospital.com / 1234 (Centro: La Paz)");
     console.log("- doctor2@hospital.com / 1234 (nickname: " + medico2Nickname + ")");
+    console.log("- coordinador@hospital.com / 1234");
     
   } catch (error) {
     console.error("Error initializing database:", error);

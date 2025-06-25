@@ -70,8 +70,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let cases;
-      if (user.rol === "experto") {
-        // Expertos ven todos los casos con nicknames anónimos
+      if (user.rol === "experto" || user.rol === "coordinador") {
+        // Expertos y coordinadores ven todos los casos
         cases = await storage.getCases();
       } else {
         // Médicos solo ven sus casos - usar nickname anónimo para buscar
