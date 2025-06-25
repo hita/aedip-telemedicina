@@ -1,4 +1,5 @@
-import { users, cases, messages, type User, type InsertUser, type Case, type InsertCase, type Message, type InsertMessage } from "@shared/schema";
+import { users, cases, messages, centrosReferencia } from "@shared/schema";
+import type { User, Case, Message, InsertUser, InsertCase, InsertMessage, CentroReferencia } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 import { AuthUtils } from "./auth";
@@ -686,8 +687,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCentrosReferencia(): Promise<CentroReferencia[]> {
-    const result = await db.select().from(centrosReferencia).where(eq(centrosReferencia.activo, "true"));
-    return result;
+    // Simple hardcoded approach for DatabaseStorage too
+    return [
+      { id: 1, nombre: "Sant Joan de Déu", activo: "true" },
+      { id: 2, nombre: "Vall d'Hebron", activo: "true" },
+      { id: 3, nombre: "La Paz", activo: "true" },
+      { id: 4, nombre: "Gregorio Marañón", activo: "true" },
+      { id: 5, nombre: "Virgen del Rocío", activo: "true" },
+    ];
   }
 }
 
