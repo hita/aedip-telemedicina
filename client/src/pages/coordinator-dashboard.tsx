@@ -15,7 +15,7 @@ import { Case, CENTROS_REFERENCIA } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
-import aedipLogo from '@assets/aedip-logo.svg';
+// import aedipLogo from '@assets/aedip-logo.svg';
 
 interface CoordinatorUser extends User {
   centroReferencia?: string | null;
@@ -217,12 +217,9 @@ export default function CoordinatorDashboard() {
       <div className="bg-white border-b border-gray-200 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <img 
-              src={aedipLogo} 
-              alt="AEDIP" 
-              className="h-8 w-auto"
-              style={{filter: 'brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)'}}
-            />
+            <div className="h-8 w-12 bg-medical-blue rounded flex items-center justify-center">
+              <span className="text-white font-bold text-sm">AEDIP</span>
+            </div>
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-light text-gray-900 tracking-tight">
               Panel de Coordinador

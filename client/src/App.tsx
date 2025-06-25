@@ -31,6 +31,15 @@ function AppContent() {
     retry: false,
   });
 
+  // Redirect to appropriate dashboard based on role
+  if (user?.user?.rol === "coordinador" && window.location.pathname === "/") {
+    window.location.href = "/coordinador";
+    return null;
+  } else if (user?.user && window.location.pathname === "/") {
+    window.location.href = "/dashboard";
+    return null;
+  }
+
   const isExpert = user?.user?.rol === "experto";
   
   return (

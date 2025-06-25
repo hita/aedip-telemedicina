@@ -32,7 +32,11 @@ export function UserBadge({ user }: UserBadgeProps) {
   };
 
   const getUserType = () => {
-    return user.rol === "experto" ? "Experto" : "Médico";
+    switch (user.rol) {
+      case "experto": return "Experto";
+      case "coordinador": return "Coordinador";
+      default: return "Médico";
+    }
   };
 
   return (

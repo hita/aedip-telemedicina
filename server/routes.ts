@@ -137,22 +137,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Expert assignment route
-  app.patch("/api/cases/:id/assign", async (req: any, res) => {
+  app.post("/api/cases/:id/assign", async (req: any, res) => {
     try {
       if (!(req.session as any)?.userId) {
         return res.status(401).json({ message: "No autenticado" });
       }
 
       const user = await storage.getUser((req.session as any).userId);
-      if (!user || user.rol !== "experto") {
-        return res.status(403).json({ message: "Solo expertos pueden asignar casos" });
+      if (!user || (user.rol !== "experto" && user.rol !== "coordinador")) {
+        return res.status(403).json({ message: "Solo los expertos y coordinadores pueden asignar casos" });
       }
 
       const caseId = parseInt(req.params.id);
-      const { action } = req.body; // "assign" or "unassign"
+      const { expertName } = req.body;
+
+      // If coordinator, use provided expertName, if expert, use their own name
+      const assignedExpert = user.rol === "coordinador" ? expertName : user.nombre;
       
-      const expertName = action === "assign" ? user.nombre : null;
-      const updatedCase = await storage.assignExpertToCase(caseId, expertName);
+      const updatedCase = await storage.assignExpertToCase(caseId, assignedExpert);
       
       if (!updatedCase) {
         return res.status(404).json({ message: "Caso no encontrado" });
@@ -280,6 +282,145 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Datos inválidos", errors: error.errors });
       }
       res.status(500).json({ message: "Error al crear mensaje" });
+    }
+  });
+
+  // Coordinator routes
+  app.get("/api/coordinator/users", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "coordinador") {
+        return res.status(403).json({ message: "Solo los coordinadores pueden acceder a esta información" });
+      }
+
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Error al obtener usuarios" });
+    }
+  });
+
+  app.post("/api/coordinator/users", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "coordinador") {
+        return res.status(403).json({ message: "Solo los coordinadores pueden crear usuarios" });
+      }
+
+      const newUser = await storage.createUser(req.body);
+      res.json(newUser);
+    } catch (error) {
+      res.status(500).json({ message: "Error al crear usuario" });
+    }
+  });
+
+  app.put("/api/coordinator/users/:id", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "coordinador") {
+        return res.status(403).json({ message: "Solo los coordinadores pueden modificar usuarios" });
+      }
+
+      const userId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedUser = await storage.updateUser(userId, updates);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      res.json(updatedUser);
+    } catch (error) {
+      res.status(500).json({ message: "Error al actualizar usuario" });
+    }
+  });
+
+  app.delete("/api/coordinator/users/:id", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "coordinador") {
+        return res.status(403).json({ message: "Solo los coordinadores pueden eliminar usuarios" });
+      }
+
+      const userId = parseInt(req.params.id);
+      const deleted = await storage.deleteUser(userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      res.json({ message: "Usuario eliminado correctamente" });
+    } catch (error) {
+      res.status(500).json({ message: "Error al eliminar usuario" });
+    }
+  });
+
+  app.post("/api/coordinator/users/:id/reset-password", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "coordinador") {
+        return res.status(403).json({ message: "Solo los coordinadores pueden resetear contraseñas" });
+      }
+
+      const userId = parseInt(req.params.id);
+      const { newPassword } = req.body;
+      
+      const success = await storage.resetUserPassword(userId, newPassword);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
+
+      res.json({ message: "Contraseña reseteada correctamente" });
+    } catch (error) {
+      res.status(500).json({ message: "Error al resetear contraseña" });
+    }
+  });
+
+  app.put("/api/coordinator/cases/:id", async (req: any, res) => {
+    try {
+      if (!(req.session as any)?.userId) {
+        return res.status(401).json({ message: "No autenticado" });
+      }
+
+      const user = await storage.getUser((req.session as any).userId);
+      if (!user || user.rol !== "coordinador") {
+        return res.status(403).json({ message: "Solo los coordinadores pueden modificar casos" });
+      }
+
+      const caseId = parseInt(req.params.id);
+      const updates = req.body;
+      
+      const updatedCase = await storage.updateCase(caseId, updates);
+      
+      if (!updatedCase) {
+        return res.status(404).json({ message: "Caso no encontrado" });
+      }
+
+      res.json(updatedCase);
+    } catch (error) {
+      res.status(500).json({ message: "Error al actualizar caso" });
     }
   });
 
