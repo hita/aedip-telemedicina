@@ -17,6 +17,12 @@ export interface IStorage {
   getMessagesByCaseId(caseId: number): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   markMessagesAsRead(caseId: number, userEmail: string): Promise<void>;
+  // Coordinator specific methods
+  getAllUsers(): Promise<User[]>;
+  updateUser(id: number, updates: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
+  resetUserPassword(id: number, newPassword: string): Promise<boolean>;
+  updateCase(caseId: number, updates: Partial<Case>): Promise<Case | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -40,7 +46,7 @@ export class MemStorage implements IStorage {
   }
 
   private async initializeUsers() {
-    const { medico: medicoPasswordHash, experto: expertoPasswordHash } = await AuthUtils.generateDefaultPasswords();
+    const { medico: medicoPasswordHash, experto: expertoPasswordHash, medico2: medico2PasswordHash } = await AuthUtils.generateDefaultPasswords();
     
     const medico: User = {
       id: 1,
@@ -48,7 +54,8 @@ export class MemStorage implements IStorage {
       password: medicoPasswordHash,
       rol: "medico",
       nombre: "Dr. García",
-      nicknameAnonimo: AuthUtils.generateAnonymousNickname("Dr. García", "doctor@hospital.com")
+      nicknameAnonimo: AuthUtils.generateAnonymousNickname("Dr. García", "doctor@hospital.com"),
+      centroReferencia: null
     };
     
     const experto: User = {
@@ -57,12 +64,24 @@ export class MemStorage implements IStorage {
       password: expertoPasswordHash,
       rol: "experto",
       nombre: "Dr. María Rodríguez",
-      nicknameAnonimo: null
+      nicknameAnonimo: null,
+      centroReferencia: "La Paz"
+    };
+
+    const coordinador: User = {
+      id: 3,
+      email: "coordinador@hospital.com",
+      password: await AuthUtils.hashPassword("1234"),
+      rol: "coordinador",
+      nombre: "Coordinador Principal",
+      nicknameAnonimo: null,
+      centroReferencia: null
     };
     
     this.users.set(1, medico);
     this.users.set(2, experto);
-    this.currentUserId = 3;
+    this.users.set(3, coordinador);
+    this.currentUserId = 4;
 
     // Initialize with sample cases
     const sampleCases: Case[] = [
@@ -382,6 +401,42 @@ export class MemStorage implements IStorage {
       this.cases.set(caseId, case_);
     }
   }
+
+  // Coordinator specific methods
+  async getAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...updates };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    return this.users.delete(id);
+  }
+
+  async resetUserPassword(id: number, newPassword: string): Promise<boolean> {
+    const user = this.users.get(id);
+    if (!user) return false;
+    
+    const hashedPassword = await AuthUtils.hashPassword(newPassword);
+    user.password = hashedPassword;
+    return true;
+  }
+
+  async updateCase(caseId: number, updates: Partial<Case>): Promise<Case | undefined> {
+    const case_ = this.cases.get(caseId);
+    if (!case_) return undefined;
+    
+    const updatedCase = { ...case_, ...updates, updatedAt: new Date().toISOString() };
+    this.cases.set(caseId, updatedCase);
+    return updatedCase;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -574,6 +629,48 @@ export class DatabaseStorage implements IStorage {
         .set({ mensajesNoLeidos: currentCounts })
         .where(eq(cases.id, caseId));
     }
+  }
+
+  // Coordinator specific methods
+  async getAllUsers(): Promise<User[]> {
+    const result = await db.select().from(users);
+    return result;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const result = await db.update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result[0];
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    const result = await db.delete(users)
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result.length > 0;
+  }
+
+  async resetUserPassword(id: number, newPassword: string): Promise<boolean> {
+    const hashedPassword = await AuthUtils.hashPassword(newPassword);
+    const result = await db.update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return result.length > 0;
+  }
+
+  async updateCase(caseId: number, updates: Partial<Case>): Promise<Case | undefined> {
+    const result = await db.update(cases)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(cases.id, caseId))
+      .returning();
+    
+    return result[0];
   }
 }
 

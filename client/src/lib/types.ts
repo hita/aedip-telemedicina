@@ -119,6 +119,13 @@ export const RAZONES_EXPERTO = {
 };
 
 // Status transitions allowed by role
+export const CENTROS_REFERENCIA = [
+  { value: "Sevilla", label: "Sevilla" },
+  { value: "Barcelona", label: "Barcelona" },
+  { value: "La Paz", label: "La Paz" },
+  { value: "Gregorio Marañon", label: "Gregorio Marañón" },
+];
+
 export const STATUS_TRANSITIONS = {
   medico: {
     "Nuevo": ["Cancelado", "Resuelto"],
@@ -128,6 +135,12 @@ export const STATUS_TRANSITIONS = {
   },
   experto: {
     "Nuevo": [],
+    "En revisión": ["Resuelto", "Cancelado"],
+    "Resuelto": ["En revisión"],
+    "Cancelado": ["En revisión"]
+  },
+  coordinador: {
+    "Nuevo": ["En revisión", "Cancelado", "Resuelto"],
     "En revisión": ["Resuelto", "Cancelado"],
     "Resuelto": ["En revisión"],
     "Cancelado": ["En revisión"]
