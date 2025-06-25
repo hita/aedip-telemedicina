@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { UserBadge } from "@/components/user-badge";
+import { RouteGuard } from "@/components/route-guard";
 import aedipLogo from "@/assets/aedip-logo-oficial.png";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CreateCaseData, SEX_OPTIONS, AGE_RANGE_OPTIONS, URGENCY_OPTIONS } from "@/lib/types";
