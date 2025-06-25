@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,7 @@ function CoordinatorDashboardContent() {
     centroReferencia: ""
   });
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Fetch current user
   const { data: currentUser } = useQuery<{ user: User }>({
@@ -236,6 +238,17 @@ function CoordinatorDashboardContent() {
             <h1 className="text-2xl font-light text-gray-900 tracking-tight">
               Panel de Coordinador
             </h1>
+            {/* Notification bubble for pending cases */}
+            {cases.filter(c => c.status === "Nuevo").length > 0 && (
+              <div className="relative">
+                <div className="bg-red-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                  {cases.filter(c => c.status === "Nuevo").length}
+                </div>
+                <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-red-600 whitespace-nowrap">
+                  casos pendientes
+                </span>
+              </div>
+            )}
           </div>
           {currentUser?.user && <UserBadge user={currentUser.user} />}
         </div>
@@ -245,7 +258,14 @@ function CoordinatorDashboardContent() {
         <Tabs defaultValue="users" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="users">Gestión de Usuarios</TabsTrigger>
-            <TabsTrigger value="cases">Gestión de Casos</TabsTrigger>
+            <TabsTrigger value="cases" className="relative">
+              Gestión de Casos
+              {cases.filter(c => c.status === "Nuevo").length > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {cases.filter(c => c.status === "Nuevo").length}
+                </div>
+              )}
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="users" className="space-y-4">
@@ -491,7 +511,11 @@ function CoordinatorDashboardContent() {
                 {/* Cases List */}
                 <div className="space-y-2">
                   {filteredCases.map(case_ => (
-                    <div key={case_.id} className="p-4 border rounded-lg">
+                    <div 
+                      key={case_.id} 
+                      className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => setLocation(`/caso/${case_.id}`)}
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -500,16 +524,21 @@ function CoordinatorDashboardContent() {
                               {case_.hashId}
                             </Badge>
                             <Badge className={
-                              case_.status === "Nuevo" ? "bg-blue-100 text-blue-700" :
+                              case_.status === "Nuevo" ? "bg-red-100 text-red-700" :
                               case_.status === "En revisión" ? "bg-yellow-100 text-yellow-700" :
                               case_.status === "Resuelto" ? "bg-green-100 text-green-700" :
-                              "bg-red-100 text-red-700"
+                              "bg-gray-100 text-gray-700"
                             }>
                               {case_.status}
                             </Badge>
                             <Badge variant="outline">
                               {case_.urgency}
                             </Badge>
+                            {case_.status === "Nuevo" && (
+                              <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">
+                                ¡Requiere atención!
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm text-gray-600 mb-2">{case_.query}</p>
                           <div className="flex items-center gap-4 text-xs text-gray-500">
