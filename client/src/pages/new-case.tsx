@@ -126,8 +126,9 @@ function NewCaseContent() {
       </div>
 
       {/* Form */}
-      <div className="px-6 py-4">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="flex-1 px-6 py-4">
+        <div className="max-w-2xl mx-auto">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Label htmlFor="title" className="text-secondary">
               Título del Caso *
@@ -291,6 +292,7 @@ function NewCaseContent() {
             </Button>
           </div>
         </form>
+        </div>
       </div>
     </>
   );

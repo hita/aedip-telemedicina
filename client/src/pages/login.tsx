@@ -36,8 +36,13 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: () => {
-      setLocation("/dashboard");
+    onSuccess: (user) => {
+      // Redirect based on role
+      if (user.rol === "coordinador") {
+        setLocation("/coordinador");
+      } else {
+        setLocation("/dashboard");
+      }
     },
     onError: () => {
       setError("Credenciales incorrectas");
