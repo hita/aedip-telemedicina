@@ -98,7 +98,7 @@ function DashboardContent() {
     <>
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-5">
-        <div className="flex items-center justify-between">
+        <div className="w-full flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <img 
               src={aedipLogo} 
@@ -116,7 +116,7 @@ function DashboardContent() {
       </div>
 
       {/* Cases List */}
-      <div className={`py-4 ${user?.user?.rol === "experto" ? "px-6 max-w-7xl mx-auto" : "px-6"}`}>
+      <div className="py-4 px-6 w-full">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-medium">
             {user?.user?.rol === "experto" ? "Todos los Casos del Sistema" : "Mis Casos"}
