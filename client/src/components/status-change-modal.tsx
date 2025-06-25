@@ -69,6 +69,7 @@ export function StatusChangeModal({ case_, userRole, isOpen, onClose }: StatusCh
   const handleClose = () => {
     setSelectedStatus("");
     setSelectedReason("");
+    setSelectedExpert("");
     onClose();
   };
 
