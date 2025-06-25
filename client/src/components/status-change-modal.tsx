@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Case, STATUS_COLORS, STATUS_TRANSITIONS, RAZONES_MEDICO, RAZONES_EXPERTO } from "@/lib/types";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface StatusChangeModalProps {
@@ -18,53 +19,63 @@ interface StatusChangeModalProps {
 export function StatusChangeModal({ case_, userRole, isOpen, onClose }: StatusChangeModalProps) {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedReason, setSelectedReason] = useState("");
+  const [selectedExpert, setSelectedExpert] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ newStatus, razon }: { newStatus: string; razon: string }) => {
-      return await apiRequest("PATCH", `/api/cases/${case_.id}/status`, { newStatus, razon });
+  const isExpert = userRole === "experto";
+  const isCoordinator = userRole === "coordinador";
+
+  // Fetch experts for coordinator reassignment
+  const { data: experts = [] } = useQuery<any[]>({
+    queryKey: ["/api/coordinator/users"],
+    enabled: isCoordinator,
+  });
+
+  const availableTransitions = STATUS_TRANSITIONS[case_.status as keyof typeof STATUS_TRANSITIONS] || [];
+  const reasonsConfig = isExpert ? RAZONES_EXPERTO : RAZONES_MEDICO;
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (isCoordinator && selectedExpert !== "") {
+        // For coordinators, update expert assignment
+        const response = await apiRequest("PUT", `/api/coordinator/cases/${case_.id}`, {
+          expertoAsignado: selectedExpert === "none" ? null : selectedExpert
+        });
+        return response.json();
+      } else {
+        // For experts/doctors, update status
+        const data: any = {
+          status: selectedStatus,
+        };
+        
+        if (selectedReason) {
+          data.razonCambio = selectedReason;
+        }
+
+        const response = await apiRequest("PUT", `/api/cases/${case_.id}/status`, data);
+        return response.json();
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cases"] });
       queryClient.invalidateQueries({ queryKey: [`/api/cases/${case_.id}`] });
       toast({
-        title: "Estado actualizado",
-        description: `El caso ha sido marcado como "${selectedStatus}"`
+        title: isCoordinator ? "Experto asignado" : "Estado actualizado",
+        description: isCoordinator 
+          ? "El experto ha sido asignado al caso" 
+          : `El caso ha sido marcado como ${selectedStatus}`,
       });
-      onClose();
-      setSelectedStatus("");
-      setSelectedReason("");
+      handleClose();
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "No se pudo actualizar el estado",
-        variant: "destructive"
+        description: error.message || "Error al actualizar",
+        variant: "destructive",
       });
-    }
+    },
   });
-
-  const handleSubmit = () => {
-    if (!selectedStatus || !selectedReason) {
-      toast({
-        title: "Campos requeridos",
-        description: "Debes seleccionar un estado y una razón",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    updateStatusMutation.mutate({
-      newStatus: selectedStatus,
-      razon: selectedReason
-    });
-  };
-
-  const availableStatuses = STATUS_TRANSITIONS[userRole as keyof typeof STATUS_TRANSITIONS][case_.status as keyof typeof STATUS_TRANSITIONS.medico] || [];
-  const reasonsKey = selectedStatus?.toLowerCase() as keyof typeof RAZONES_MEDICO;
-  const reasons = userRole === "medico" 
-    ? RAZONES_MEDICO[reasonsKey] || []
-    : RAZONES_EXPERTO[reasonsKey] || [];
 
   const handleClose = () => {
     setSelectedStatus("");
@@ -73,74 +84,104 @@ export function StatusChangeModal({ case_, userRole, isOpen, onClose }: StatusCh
     onClose();
   };
 
+  const canSubmit = isCoordinator 
+    ? selectedExpert !== "" 
+    : selectedStatus && (!reasonsConfig[selectedStatus] || selectedReason);
+
+  const handleSubmit = () => {
+    mutation.mutate();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Cambiar Estado del Caso</DialogTitle>
+          <DialogTitle>
+            {isCoordinator ? "Asignar Experto" : "Cambiar Estado del Caso"}
+          </DialogTitle>
           <DialogDescription>
-            Selecciona el nuevo estado y proporciona una razón para el cambio.
+            Caso: {case_.title} ({case_.hashId})
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
-          <div>
-            <p className="text-sm text-gray-600 mb-2">Estado actual:</p>
-            <Badge className={STATUS_COLORS[case_.status as keyof typeof STATUS_COLORS]}>
-              {case_.status}
-            </Badge>
-            {case_.reabierto && (
-              <Badge variant="outline" className="ml-2 text-orange-600 border-orange-300">
-                Reabierto
-              </Badge>
-            )}
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Nuevo estado:</label>
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Seleccionar estado" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableStatuses.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedStatus && (
+          {isCoordinator ? (
             <div>
-              <label className="text-sm font-medium">Razón del cambio:</label>
-              <Select value={selectedReason} onValueChange={setSelectedReason}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Seleccionar razón" />
+              <Label>Asignar Experto</Label>
+              <Select value={selectedExpert} onValueChange={setSelectedExpert}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un experto" />
                 </SelectTrigger>
                 <SelectContent>
-                  {reasons.map((reason) => (
-                    <SelectItem key={reason} value={reason}>
-                      {reason}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="none">Sin asignar</SelectItem>
+                  {experts
+                    .filter(user => user.rol === "experto")
+                    .map((expert) => (
+                      <SelectItem key={expert.id} value={expert.nombre}>
+                        {expert.nombre} ({expert.centroReferencia || "Sin centro"})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
+              {case_.expertoAsignado && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Actualmente asignado a: {case_.expertoAsignado}
+                </p>
+              )}
             </div>
-          )}
+          ) : (
+            <>
+              <div>
+                <Label>Nuevo Estado</Label>
+                <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableTransitions.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={handleClose}>
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleSubmit}
-              disabled={!selectedStatus || !selectedReason || updateStatusMutation.isPending}
-            >
-              {updateStatusMutation.isPending ? "Actualizando..." : "Actualizar Estado"}
-            </Button>
-          </div>
+              {selectedStatus && reasonsConfig[selectedStatus] && (
+                <div>
+                  <Label>Razón del Cambio</Label>
+                  <Select value={selectedReason} onValueChange={setSelectedReason}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona una razón" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {reasonsConfig[selectedStatus].map((reason: string) => (
+                        <SelectItem key={reason} value={reason}>
+                          {reason}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="flex justify-end space-x-2 pt-4">
+          <Button variant="outline" onClick={handleClose}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={!canSubmit || mutation.isPending}
+          >
+            {mutation.isPending 
+              ? "Actualizando..." 
+              : isCoordinator 
+                ? "Asignar" 
+                : "Actualizar"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

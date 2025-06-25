@@ -12,8 +12,11 @@ interface ClickableStatusBadgeProps {
 export function ClickableStatusBadge({ case_, userRole }: ClickableStatusBadgeProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const availableTransitions = STATUS_TRANSITIONS[userRole as keyof typeof STATUS_TRANSITIONS][case_.status as keyof typeof STATUS_TRANSITIONS.medico] || [];
-  const isClickable = availableTransitions.length > 0;
+  // Show for experts and coordinators with specific status combinations
+  const shouldShowAsClickable = (userRole === "experto" || userRole === "coordinador") && 
+    (case_.status === "Nuevo" || case_.status === "En revisión");
+  
+  const isClickable = shouldShowAsClickable;
 
   const handleClick = () => {
     if (isClickable) {
