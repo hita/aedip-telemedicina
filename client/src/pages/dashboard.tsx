@@ -15,7 +15,7 @@ import { Case, STATUS_COLORS, sortCases } from "@/lib/types";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Dashboard() {
+function DashboardContent() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [filteredCases, setFilteredCases] = useState<Case[]>([]);
@@ -280,5 +280,13 @@ export default function Dashboard() {
         )}
       </div>
     </>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <RouteGuard allowedRoles={["medico", "experto"]}>
+      <DashboardContent />
+    </RouteGuard>
   );
 }

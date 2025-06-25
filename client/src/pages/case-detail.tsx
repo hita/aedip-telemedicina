@@ -10,7 +10,7 @@ import { UrgencyIndicator } from "@/components/urgency-indicator";
 import { CaseChat } from "@/components/case-chat";
 import { Case, STATUS_COLORS, SEX_OPTIONS, AGE_RANGE_OPTIONS } from "@/lib/types";
 
-export default function CaseDetail() {
+function CaseDetailContent() {
   const [, setLocation] = useLocation();
   const { id } = useParams();
 

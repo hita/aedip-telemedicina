@@ -16,7 +16,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { RouteGuard } from "@/components/route-guard";
-import aedipLogo from '@assets/aedip-logo.svg';
+// Use same logo approach as dashboard
 
 interface CoordinatorUser extends User {
   centroReferencia?: string | null;
@@ -229,12 +229,9 @@ function CoordinatorDashboardContent() {
       <div className="bg-white border-b border-gray-200 px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <img 
-              src={aedipLogo} 
-              alt="AEDIP" 
-              className="h-8 w-auto"
-              style={{filter: 'brightness(0) saturate(100%) invert(21%) sepia(89%) saturate(1755%) hue-rotate(213deg) brightness(94%) contrast(97%)'}}
-            />
+            <div className="h-8 w-12 bg-medical-blue rounded flex items-center justify-center">
+              <span className="text-white font-bold text-sm">AEDIP</span>
+            </div>
             <div className="h-6 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-light text-gray-900 tracking-tight">
               Panel de Coordinador
@@ -305,7 +302,14 @@ function CoordinatorDashboardContent() {
                         </div>
                         <div>
                           <Label htmlFor="rol">Rol</Label>
-                          <Select value={newUserData.rol} onValueChange={(value) => setNewUserData({ ...newUserData, rol: value })}>
+                          <Select value={newUserData.rol} onValueChange={(value) => {
+                          const updates = { ...newUserData, rol: value };
+                          // Clear centro de referencia if not experto
+                          if (value !== "experto") {
+                            updates.centroReferencia = "";
+                          }
+                          setNewUserData(updates);
+                        }}>
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>

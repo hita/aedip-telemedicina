@@ -33,7 +33,7 @@ const caseSchema = z.object({
   }),
 });
 
-export default function NewCase() {
+function NewCaseContent() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
